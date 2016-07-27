@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "DXMain.h"
 
-#include <d3d11.h>
+#include <d3d11_2.h>
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>
@@ -37,17 +37,21 @@ private:
 	IDXGISwapChain			*	m_pdxgiSwapChain			{ nullptr }	;
 
 	ID3D11RenderTargetView	*	m_pd3dRenderTargetView		{ nullptr }	;
-	ID3D11DeviceContext		*	m_pd3dDeviceContext		{ nullptr }	;
+	ID3D11DeviceContext		*	m_pd3dDeviceContext			{ nullptr }	;
 
 	HINSTANCE					m_hInstance					{ NULL }	;
 	HWND						m_hWnd						{ NULL }	;
-	RECT						m_rcClient							;
+	RECT						m_rcClient								;
 public:
 
 	CDXFramework() = default;
 	~CDXFramework()
 	{
 		// Release 객체
+		if (m_pd3dDevice) m_pd3dDevice->Release();
+		if (m_pdxgiSwapChain) m_pdxgiSwapChain->Release();
+		if (m_pd3dRenderTargetView) m_pd3dRenderTargetView->Release();
+		if (m_pd3dDeviceContext) m_pd3dDeviceContext->Release();
 	}
 
 	void Initialize(HINSTANCE hInstance, HWND hWnd)
@@ -56,10 +60,10 @@ public:
 		m_hWnd = hWnd;
 		GetClientRect(m_hWnd, &m_rcClient);
 
-		CreateD3DXDeivce();
+		CreateD3D11Deivce();
 	}
 
-	bool CreateD3DXDeivce()
+	bool CreateD3D11Deivce()
 	{
 		// Swap Chain Description 구조체
 		DXGI_SWAP_CHAIN_DESC dxgiSwapChainDesc;
@@ -67,7 +71,7 @@ public:
 		// 구조체 비우기
 		::ZeroMemory(&dxgiSwapChainDesc, sizeof(dxgiSwapChainDesc));
 		// BufferCount : 후면 버퍼의 수를 지정
-		dxgiSwapChainDesc.BufferCount = 1;
+		dxgiSwapChainDesc.BufferCount = 2;
 		
 		// BufferDesc : 후면 버퍼의 디스플레이 형식을 지정
 		{
@@ -77,7 +81,7 @@ public:
 			dxgiSwapChainDesc.BufferDesc.Height = m_rcClient.bottom;
 			// Format : 후면 버퍼 픽셀 형식
 			/// DirectX 11-1(Chap 01)-Device, p.49 참조
-			dxgiSwapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			dxgiSwapChainDesc.BufferDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 			// RefreshRate : 화면 갱신 비율을 Hz 단위로 지정
 			{
 				// Denominator : 분모
@@ -128,9 +132,10 @@ public:
 		dxgiSwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH/*2*/;
 
 		// SwapEffect : Swaping을 처리하는 선택사항을 지정(기본 : 0)
-		//	DXGI_SWAP_EFFECT_DISCARD	(0) : 버퍼 내용을 폐기
-		//	DXGI_SWAP_EFFECT_SEQUENTIAL	(1) : 순차 복사
-		dxgiSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+		//	DXGI_SWAP_EFFECT_DISCARD		(0) : 버퍼 내용을 폐기
+		//	DXGI_SWAP_EFFECT_SEQUENTIAL		(1) : 순차 복사
+		// DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL	(2) : Flip 순차 복사
+		dxgiSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 		
 		#pragma endregion
 
@@ -200,18 +205,23 @@ public:
 			return(false);
 		}
 
-		// DXGI Factory 인스턴스를 DXGIFactory에서 받습니다.
-		IDXGIFactory1 *pdxgiFactory = NULL;
-		if (FAILED(hResult = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void **)&pdxgiFactory)))
-		{
-			MessageBox(m_hWnd, TEXT("DXGIFactory에서의 객체 생성이 실패했습니다. 프로그램을 종료합니다."), TEXT("프로그램 구동 실패"), MB_OK);
-			return(false);
-		}
 		// DXGI Device 를 받습니다.
-		IDXGIDevice *pdxgiDevice = NULL;
-		if (FAILED(hResult = m_pd3dDevice->QueryInterface(__uuidof(IDXGIDevice), (void **)&pdxgiDevice)))
+		IDXGIDevice3 *pdxgiDevice = NULL;
+		if (FAILED(hResult = m_pd3dDevice->QueryInterface(__uuidof(IDXGIDevice3), (LPVOID*)&pdxgiDevice)))
 		{
 			MessageBox(m_hWnd, TEXT("DXGI Device 객체를 반환받지 못했습니다. 프로그램을 종료합니다."), TEXT("프로그램 구동 실패"), MB_OK);
+			return(false);
+		}
+		// DXGI Factory 인스턴스를 DXGIFactory에서 받습니다.
+		IDXGIFactory3 *pdxgiFactory = NULL;
+
+		UINT udxgiFlag = 0;
+#ifdef _DEBUG
+		udxgiFlag |= DXGI_CREATE_FACTORY_DEBUG;
+#endif
+		if (FAILED(hResult = CreateDXGIFactory2(udxgiFlag, __uuidof(IDXGIFactory3), (LPVOID*)&pdxgiFactory)))
+		{
+			MessageBox(m_hWnd, TEXT("DXGIFactory에서의 객체 생성이 실패했습니다. 프로그램을 종료합니다."), TEXT("프로그램 구동 실패"), MB_OK);
 			return(false);
 		}
 		//  SwapChain 을 생성합니다
@@ -231,6 +241,19 @@ public:
 		return(true);
 
 	}
+
+	bool CreateRenderTargetView()
+	{
+		ID3D11Texture2D *pd3dBackBuffer{ nullptr };
+		
+		m_pdxgiSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pd3dBackBuffer);
+		m_pd3dDevice->CreateRenderTargetView(pd3dBackBuffer, NULL, &m_pd3dRenderTargetView);
+		pd3dBackBuffer->Release();
+		m_pd3dDeviceContext->OMSetRenderTargets(1, &m_pd3dRenderTargetView, nullptr);
+
+		return true;
+	}
+
 
 };
 
