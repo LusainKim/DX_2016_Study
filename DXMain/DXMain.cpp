@@ -5,6 +5,7 @@
 #include "DXMain.h"
 
 #include <d3d11_2.h>
+#include <dxgi1_3.h>
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>
@@ -230,15 +231,13 @@ public:
 			MessageBox(m_hWnd, TEXT("SwapChain 인스턴스 생성이 실패했습니다. 프로그램을 종료합니다."), TEXT("프로그램 구동 실패"), MB_OK);
 			return(false);
 		}
-
 		// 할당받은 COM 객체를 반환합니다.
 		if (pdxgiDevice) pdxgiDevice->Release();
 		if (pdxgiFactory) pdxgiFactory->Release();
 
 		// render target과 depth-stencil buffer 생성
 		// TODO:
-
-		return(true);
+		return(CreateRenderTargetView());
 
 	}
 
@@ -251,15 +250,23 @@ public:
 		pd3dBackBuffer->Release();
 		m_pd3dDeviceContext->OMSetRenderTargets(1, &m_pd3dRenderTargetView, nullptr);
 
+	//	DXGI_FRAME_STATISTICS p;
+	//	m_pdxgiSwapChain->GetFrameStatistics(&p);
 		return true;
 	}
 
+	using FLOAT4Array = float[4];
+	void FrameAdvance()
+	{
+		m_pd3dDeviceContext->ClearRenderTargetView(m_pd3dRenderTargetView, FLOAT4Array{0.0f, 0.5f, 0.8f, 1.0f});
+		m_pdxgiSwapChain->Present(0, 0);
+	}
 
 };
 
 
 
-
+CDXFramework fw;
 
 #define MAX_LOADSTRING 100
 
@@ -300,13 +307,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MSG msg;
 
     // 기본 메시지 루프입니다.
-    while (GetMessage(&msg, nullptr, 0, 0))
+    while (true)
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			if (msg.message == WM_QUIT) break;
+			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		}
+		else fw.FrameAdvance();
+
     }
 
     return (int) msg.wParam;
@@ -361,6 +374,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    {
       return FALSE;
    }
+
+   fw.Initialize(hInst, hWnd);
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
