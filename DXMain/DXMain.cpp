@@ -42,7 +42,7 @@ constexpr size_t GetArraySize(Ty (&)[N]) noexcept
 }
 
 
-class CDXFramework {
+class CDirectXFramework {
 
 private:
 
@@ -65,8 +65,8 @@ private:
 
 public:
 
-	CDXFramework() = default;
-	~CDXFramework()
+	CDirectXFramework() = default;
+	~CDirectXFramework()
 	{
 		// Release 객체
 		if (m_pd3dDevice) m_pd3dDevice->Release();
@@ -290,6 +290,7 @@ public:
 			return(false);
 		}
 
+		// Direct2D : Direct2D 인스턴스를 생성합니다.
 		if (!CreateD2D1Device(pdxgiDevice))
 		{
 			MessageBox(m_hWnd, TEXT("Direct2D 인스턴스 생성이 실패했습니다. 프로그램을 종료합니다."), TEXT("프로그램 구동 실패"), MB_OK);
@@ -413,7 +414,7 @@ public:
 		// Rendering Resource 생성
 		CreateRenderingResource();
 
-		// RenderTarget에서 2DBackBuffer 획득 
+		// Direct2D : RenderTarget에서 2DBackBuffer를 획득합니다.
 		return(CreateD2DBackBuffer());
 
 //		return true;
@@ -803,8 +804,6 @@ private:
 	// 이전까지의 Drawing 상태를 저장합니다.
 	ID2D1DrawingStateBlock1			*	m_pd2dStateBlock	{ nullptr }	;
 
-public:
-
 	void ReleaseD2DResources()
 	{
 		if (m_pd2dDevice) m_pd2dDevice->Release();
@@ -819,6 +818,7 @@ public:
 		if (m_pd2dStateBlock) m_pd2dStateBlock->Release();
 	}
 
+public:
 
 	bool CreateD2D1Device(IDXGIDevice3* pdxgiDevice)
 	{
@@ -938,7 +938,7 @@ public:
 
 	void Render2D() 
 	{
-		m_pd2dDeviceContext->SaveDrawingState(m_pd2dStateBlock);
+	//	m_pd2dDeviceContext->SaveDrawingState(m_pd2dStateBlock);
 
 		m_pd2dDeviceContext->BeginDraw();
 		{
@@ -954,14 +954,14 @@ public:
 		}
 		m_pd2dDeviceContext->EndDraw();
 
-		m_pd2dDeviceContext->RestoreDrawingState(m_pd2dStateBlock);
+	//	m_pd2dDeviceContext->RestoreDrawingState(m_pd2dStateBlock);
 	}
 
 };
 
 
 
-CDXFramework fw;
+CDirectXFramework framework;
 
 #define MAX_LOADSTRING 100
 
@@ -1015,7 +1015,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		else
 		{
-			fw.FrameAdvance();
+			framework.FrameAdvance();
 		}
 
     }
@@ -1073,7 +1073,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-   fw.Initialize(hInst, hWnd);
+   framework.Initialize(hInst, hWnd);
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
