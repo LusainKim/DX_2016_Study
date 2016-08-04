@@ -1,31 +1,39 @@
 // DXMain.cpp : 응용 프로그램에 대한 진입점을 정의합니다.
-//
+// 대상 플랫폼 : Windows 10
+// 대상 플랫폼 버전 : 10.0.10586.0 기준 작성(하위버전에서는 단계를 내려야 합니다)
 
 #include "stdafx.h"
 #include "DXMain.h"
 
+// D3D11
 #include <d3d11_2.h>
 #include <dxgi1_3.h>
+
+// D2D1
+#include <d2d1_3.h>
+#include <dwrite_3.h>
+#include <d2d1_2helper.h>
+#include <wincodec.h>
+
+// DirectX Math
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>
 #include <DirectXCollision.h>
 
+// C++11
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
 #include <chrono>
 
-#include <d3dcompiler.h>
-#pragma comment(lib, "d3dcompiler")
-
 using namespace std;
 using namespace std::chrono;
 
+using namespace D2D1;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
-
 
 template<typename Ty, size_t N>
 constexpr size_t GetArraySize(Ty (&)[N]) noexcept
@@ -71,7 +79,10 @@ public:
 		if (m_pd3dDepthStencilView) m_pd3dDepthStencilView->Release();
 
 		// Rendering 관련된, 세이더 등의 COM 객체는 별도로 해제
-		ReleaseShaderResource();
+		ReleaseShaderResources();
+
+		// D2D Resource 해제
+		ReleaseD2DResources();
 	}
 
 	void Initialize(HINSTANCE hInstance, HWND hWnd)
@@ -200,12 +211,40 @@ public:
 		// Result Handle 입니다. 장치가 성공적으로 생성도는지 검사합니다.
 		HRESULT hResult = S_OK;
 
+		// 이 플래그는 API 기본값과 다른 색 채널 순서의 표면에 대한 지원을
+		// 추가합니다. Direct2D와의 호환성을 위해 필요합니다.
+		UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+
+	#if defined(_DEBUG)
+
+		auto IsSDKLayerAvailable = []() -> bool {
+			return SUCCEEDED(D3D11CreateDevice(nullptr
+				, D3D_DRIVER_TYPE_NULL			// 실제 하드웨어 장치를 만들 필요가 없습니다.
+				, 0
+				, D3D11_CREATE_DEVICE_DEBUG		// SDK 레이어를 확인하세요.
+				, nullptr						// 모든 기능 수준이 적용됩니다.
+				, 0
+				, D3D11_SDK_VERSION				// Windows 스토어 앱의 경우 항상 이 값을 D3D11_SDK_VERSION으로 설정합니다.
+				, nullptr						// D3D 장치 참조를 보관할 필요가 없습니다.
+				, nullptr						// 기능 수준을 알 필요가 없습니다.
+				, nullptr						// D3D 장치 컨텍스트 참조를 보관할 필요가 없습니다.
+			));
+		};
+
+		// SDK 레이어 지원을 확인하세요.
+		if (IsSDKLayerAvailable())
+		{
+			// 프로젝트가 디버그 빌드 중인 경우에는 이 플래그가 있는 SDK 레이어를 통해 디버깅을 사용하십시오.
+			creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+		}
+	#endif
+
 		for (D3D_DRIVER_TYPE &p : d3dDriverTypes)
 		{
 			if (SUCCEEDED(hResult = D3D11CreateDevice(	  NULL						// 기본 어댑터를 사용하려면 nullptr을 지정합니다.
 														, p							// 하드웨어 그래픽 드라이버를 사용하여 장치를 만듭니다.
 														, 0							// 드라이버가 D3D_DRIVER_TYPE_SOFTWARE가 아닌 경우 0이어야 합니다.
-														, 0							// 디버그 및 Direct2D 호환성 플래그를 설정합니다.
+														, creationFlags				// 디버그 및 Direct2D 호환성 플래그를 설정합니다.
 														, d3dFeatureLevels			// 이 응용 프로그램이 지원할 수 있는 기능 수준 목록입니다.
 														, szFeatureLevel			// 위 목록의 크기입니다.
 														, D3D11_SDK_VERSION			// Windows 스토어 앱의 경우 항상 이 값을 D3D11_SDK_VERSION으로 설정합니다.
@@ -250,14 +289,26 @@ public:
 			MessageBox(m_hWnd, TEXT("SwapChain 인스턴스 생성이 실패했습니다. 프로그램을 종료합니다."), TEXT("프로그램 구동 실패"), MB_OK);
 			return(false);
 		}
+
+		if (!CreateD2D1Device(pdxgiDevice))
+		{
+			MessageBox(m_hWnd, TEXT("Direct2D 인스턴스 생성이 실패했습니다. 프로그램을 종료합니다."), TEXT("프로그램 구동 실패"), MB_OK);
+			return(false);
+		}
+
 		// 할당받은 COM 객체를 반환합니다.
 		if (pdxgiDevice) pdxgiDevice->Release();
 		if (pdxgiFactory) pdxgiFactory->Release();
 
 		// render target과 depth-stencil buffer 생성
-		// TODO:
-		return(CreateRenderTargetView());
+		if(!CreateRenderTargetView())
+		{
+			MessageBox(m_hWnd, TEXT("RenderTarget이나 Depth-Stencil 버퍼 생성이 실패했습니다. 프로그램을 종료합니다."), TEXT("프로그램 구동 실패"), MB_OK);
+			return(false);
+		}
 
+
+		return true;
 	}
 
 	bool CreateRenderTargetView()
@@ -302,10 +353,6 @@ public:
 			// Format : texture 픽셀 형식
 			d3dDepthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-		#ifdef _WITH_MSAA4_MULTISAMPLING
-			d3dDepthStencilBufferDesc.SampleDesc.Count = 4;
-			d3dDepthStencilBufferDesc.SampleDesc.Quality = m_n4xMSAAQualities - 1;
-		#else
 			// SampleDesc : 다중 샘플링의 품질을 지정
 			// CheckMultisampleQualityLevels 함수를 사용하여 다중 샘플링 가능 여부를 확인한 뒤에 값 변경
 			{
@@ -318,7 +365,6 @@ public:
 				// 0 : 다중 샘플링을 하지 않음
 				d3dDepthStencilBufferDesc.SampleDesc.Quality = 0;
 			}
-		#endif
 
 			// Usage : texture 를 읽고 쓰는 방법에 대한 정의
 			d3dDepthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -337,12 +383,9 @@ public:
 			ZeroMemory(&d3dDepthStencilViewDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
 			d3dDepthStencilViewDesc.Format = d3dDepthStencilBufferDesc.Format;
 
-		#ifdef _WITH_MSAA4_MULTISAMPLING
-			d3dDepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
-		#else
 			d3dDepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		#endif
 			d3dDepthStencilViewDesc.Texture2D.MipSlice = 0;
+
 			if (FAILED(hResult = m_pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer, &d3dDepthStencilViewDesc, &m_pd3dDepthStencilView))) return(false);
 
 
@@ -370,7 +413,10 @@ public:
 		// Rendering Resource 생성
 		CreateRenderingResource();
 
-		return true;
+		// RenderTarget에서 2DBackBuffer 획득 
+		return(CreateD2DBackBuffer());
+
+//		return true;
 	}
 
 	std::chrono::system_clock::time_point m_current_time = chrono::system_clock::now();
@@ -399,6 +445,7 @@ public:
 
 		// 지속적인 상수버퍼의 갱신을 확인하기 위한 Update 함수
 		Update(static_cast<float>(m_timeElapsed.count()));
+		Update2D();
 
 		// OM에 RenderTarget 재설정
 		m_pd3dDeviceContext->OMSetRenderTargets(1, &m_pd3dRenderTargetView, m_pd3dDepthStencilView);
@@ -408,6 +455,7 @@ public:
 		m_pd3dDeviceContext->ClearDepthStencilView(m_pd3dDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		Render();
+		Render2D();
 
 		m_pdxgiSwapChain->Present(0, 0);
 	}
@@ -456,28 +504,31 @@ private:
 		DirectX::XMFLOAT3 color;
 	};
 	
-	ID3D11Buffer						*m_vertexBuffer			;
-	ID3D11Buffer						*m_indexBuffer			;
-	ID3D11Buffer						*m_constantBuffer		;
+	ID3D11Buffer						*	m_vertexBuffer			{ nullptr }	;
+	ID3D11Buffer						*	m_indexBuffer			{ nullptr }	;
+	ID3D11Buffer						*	m_constantBuffer		{ nullptr }	;
 
-	ID3D11VertexShader					*m_vertexShader			;
-	ID3D11PixelShader					*m_pixelShader			;
+	ID3D11VertexShader					*	m_vertexShader			{ nullptr } ;
+	ID3D11PixelShader					*	m_pixelShader			{ nullptr } ;
 
-	ID3D11InputLayout					*m_inputLayout			;
-	ID3D11RasterizerState				*m_pd3dRasterizerState	;
-	ModelViewProjectionConstantBuffer	m_constantBufferData	;
+	ID3D11InputLayout					*	m_inputLayout			{ nullptr }	;
+	ID3D11RasterizerState				*	m_pd3dRasterizerState	{ nullptr }	;
 
-	UINT								m_indexCount			;
+	ModelViewProjectionConstantBuffer		m_constantBufferData	{         }	;
 
-	void ReleaseShaderResource()
+	UINT									m_indexCount			{    0    }	;
+
+	void ReleaseShaderResources()
 	{
 		if (m_vertexBuffer)			m_vertexBuffer->Release();
 		if (m_indexBuffer)			m_indexBuffer->Release();
 		if (m_constantBuffer)		m_constantBuffer->Release();
+
 		if (m_vertexShader)			m_vertexShader->Release();
 		if (m_pixelShader)			m_pixelShader->Release();
-		if (m_pd3dRasterizerState)	m_pd3dRasterizerState->Release();
+
 		if (m_inputLayout)			m_inputLayout->Release();
+		if (m_pd3dRasterizerState)	m_pd3dRasterizerState->Release();
 	}
 
 public:
@@ -729,6 +780,181 @@ public:
 	{
 		// 업데이트된 모델 매트릭스를 셰이더에 전달하도록 준비합니다.
 		XMStoreFloat4x4(&m_constantBufferData.model, XMMatrixTranspose(XMMatrixRotationY(radians)));
+	}
+
+
+
+	// 2D code
+private:
+
+	ID2D1Device2					*	m_pd2dDevice		{ nullptr }	;
+	ID2D1Factory3					*	m_pd2dFactory		{ nullptr }	;
+	ID2D1DeviceContext2				*	m_pd2dDeviceContext	{ nullptr }	;
+	IDWriteFactory3					*	m_pdwFactory		{ nullptr }	;
+	IWICImagingFactory2				*	m_wicFactory		{ nullptr }	;
+	
+	// 3D SwapChain에서 RenderTarget을 얻기 위한 BackBuffer 입니다.
+	ID2D1Bitmap1					*	m_pd2dBmpBackBuffer { nullptr }	;
+
+	wstring								m_strText			{         }	;
+	ID2D1SolidColorBrush			*	m_pd2dsbrText		{ nullptr }	;
+	IDWriteTextLayout3				*	m_pdwTextLayout		{ nullptr }	;
+	IDWriteTextFormat2				*	m_pdwTextFormat		{ nullptr }	;
+	// 이전까지의 Drawing 상태를 저장합니다.
+	ID2D1DrawingStateBlock1			*	m_pd2dStateBlock	{ nullptr }	;
+
+public:
+
+	void ReleaseD2DResources()
+	{
+		if (m_pd2dDevice) m_pd2dDevice->Release();
+		if (m_pd2dFactory) m_pd2dFactory->Release();
+		if (m_pd2dDeviceContext) m_pd2dDeviceContext->Release();
+		if (m_pdwFactory) m_pdwFactory->Release();
+		if (m_wicFactory) m_wicFactory->Release();
+		if (m_pd2dBmpBackBuffer) m_pd2dBmpBackBuffer->Release();
+		if (m_pd2dsbrText) m_pd2dsbrText->Release();
+		if (m_pdwTextLayout) m_pdwTextLayout->Release();
+		if (m_pdwTextFormat) m_pdwTextFormat->Release();
+		if (m_pd2dStateBlock) m_pd2dStateBlock->Release();
+	}
+
+
+	bool CreateD2D1Device(IDXGIDevice3* pdxgiDevice)
+	{
+		if(pdxgiDevice) pdxgiDevice->AddRef();
+		else return (false);
+
+		HRESULT hResult = S_OK;
+
+		// Direct2D 리소스를 초기화합니다.
+		D2D1_FACTORY_OPTIONS options;
+		ZeroMemory(&options, sizeof(D2D1_FACTORY_OPTIONS));
+
+	#if defined(_DEBUG)
+		// 프로젝트가 디버그 빌드 중인 경우 SDK 레이어를 통해 Direct2D 디버깅을 사용합니다.
+		options.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
+	#endif
+
+		// Direct2D 팩터리를 초기화합니다.
+		if(FAILED(hResult = D2D1CreateFactory(	  D2D1_FACTORY_TYPE_SINGLE_THREADED
+												, __uuidof(ID2D1Factory3)
+												, &options
+												, reinterpret_cast<LPVOID*>(&m_pd2dFactory)
+		))) goto ReleaseDXGI;
+
+		// DirectWrite 팩터리를 초기화합니다.
+		if (FAILED(hResult = DWriteCreateFactory(	  DWRITE_FACTORY_TYPE_SHARED
+													, __uuidof(IDWriteFactory3)
+													, reinterpret_cast<IUnknown**>(&m_pdwFactory)
+		))) goto ReleaseDXGI;
+
+		// COM Library를 초기화합니다.
+		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+
+		// WIC(Windows Imaging Component) 팩터리를 초기화합니다.
+		if (FAILED(hResult = CoCreateInstance(	  CLSID_WICImagingFactory
+												, nullptr
+												, CLSCTX_INPROC_SERVER
+												, IID_PPV_ARGS(&m_wicFactory)
+		))) goto ReleaseDXGI;
+
+		m_pd2dFactory->CreateDevice(pdxgiDevice, &m_pd2dDevice);
+
+		// Direct2D DC를 생성합니다.
+		m_pd2dDevice->CreateDeviceContext(
+			  D2D1_DEVICE_CONTEXT_OPTIONS_NONE
+			, &m_pd2dDeviceContext
+		);
+
+	ReleaseDXGI:
+		pdxgiDevice->Release();
+		return (!FAILED(hResult));
+	}
+
+	bool CreateD2DBackBuffer()
+	{
+		// 화면의 해상도를 얻습니다.
+		float fdpiX, fdpiY;
+		m_pd2dFactory->GetDesktopDpi(&fdpiX, &fdpiY);
+		
+		HRESULT hResult = S_OK;
+
+		// 스왑 체인 백 버퍼에 연결된 Direct2D 대상
+		// 비트맵을 만들고 이를 현재 대상으로 설정합니다.
+		D2D1_BITMAP_PROPERTIES1 bitmapProperties =
+			BitmapProperties1(	  D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW
+					, PixelFormat(DXGI_FORMAT_R16G16B16A16_FLOAT, D2D1_ALPHA_MODE_PREMULTIPLIED)
+					, fdpiX
+					, fdpiY
+			);
+
+		IDXGISurface2 *dxgiBackBuffer;
+		if (FAILED(hResult = m_pdxgiSwapChain->GetBuffer(0, IID_PPV_ARGS(&dxgiBackBuffer)))) return false;
+		if (FAILED(hResult = m_pd2dDeviceContext->CreateBitmapFromDxgiSurface(	  dxgiBackBuffer
+																				, &bitmapProperties
+																				, &m_pd2dBmpBackBuffer
+		))) return false;
+
+		m_pd2dDeviceContext->SetTarget(m_pd2dBmpBackBuffer);
+		m_pd2dDeviceContext->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
+
+		CreateDwriteDevice();
+
+		return true;
+	}
+
+	void CreateDwriteDevice()
+	{
+
+		m_pdwFactory->CreateTextFormat(	  L"D2Coding"
+										, nullptr
+										, DWRITE_FONT_WEIGHT_LIGHT
+										, DWRITE_FONT_STYLE_NORMAL
+										, DWRITE_FONT_STRETCH_NORMAL
+										, 32.0f
+										, L"ko-kr"
+										, reinterpret_cast<IDWriteTextFormat**>(&m_pdwTextFormat)
+		);
+		m_pdwTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		m_pd2dFactory->CreateDrawingStateBlock(&m_pd2dStateBlock);
+		m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &m_pd2dsbrText);
+	}
+
+	void Update2D()
+	{
+		m_strText = L"Test Text";
+
+		if (m_pdwTextLayout) m_pdwTextLayout->Release();
+
+		m_pdwFactory->CreateTextLayout(   m_strText.c_str()
+										, m_strText.length()
+										, m_pdwTextFormat
+										, 240.f
+										, 50.f
+										, reinterpret_cast<IDWriteTextLayout**>(&m_pdwTextLayout)
+		);
+	}
+
+	void Render2D() 
+	{
+		m_pd2dDeviceContext->SaveDrawingState(m_pd2dStateBlock);
+
+		m_pd2dDeviceContext->BeginDraw();
+		{
+			Matrix3x2F screenTranslation { Matrix3x2F::Identity() };
+			m_pd2dDeviceContext->SetTransform(screenTranslation);
+
+			m_pdwTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
+			m_pd2dDeviceContext->DrawTextLayout(	  Point2F(0.f, 0.f)
+													, m_pdwTextLayout
+													, m_pd2dsbrText
+			);
+
+		}
+		m_pd2dDeviceContext->EndDraw();
+
+		m_pd2dDeviceContext->RestoreDrawingState(m_pd2dStateBlock);
 	}
 
 };
