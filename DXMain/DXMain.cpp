@@ -566,8 +566,12 @@ public:
 		static const XMVECTORF32 at = { 0.0f, -0.1f, 0.0f, 0.0f };
 		static const XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
 
+		auto aaa = XMMatrixLookAtRH(eye, at, up);
 		// 각자 각 입력.
 		XMStoreFloat4x4(&m_constantBufferData.view, XMMatrixTranspose(XMMatrixLookAtRH(eye, at, up)));
+
+
+
 		XMStoreFloat4x4(&m_constantBufferData.model, XMMatrixTranspose(XMMatrixRotationY(0.f)));
 
 		CreateShader();
