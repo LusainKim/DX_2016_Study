@@ -13,13 +13,61 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="미리 컴파일된 헤더">
+      <UniqueIdentifier>{d824c1f5-36f5-4190-8fab-9f3f35ef32f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework">
+      <UniqueIdentifier>{11fe9ecf-130c-4bbb-abbd-ac0f675ac740}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject">
+      <UniqueIdentifier>{1e37e477-1449-44e9-b503-7f73102c42a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Base">
+      <UniqueIdentifier>{7c9df613-fdf5-4dee-ac64-c617e7eb9c3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Base\Mesh">
+      <UniqueIdentifier>{f695d334-2cb8-4864-bc0d-96aa1b90a194}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Base\Shader">
+      <UniqueIdentifier>{ac2beb79-8b1d-4a9c-8fe0-cdbdcd405336}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Base\Object">
+      <UniqueIdentifier>{70ac1fef-19c5-4d7c-824f-4a3da926a06b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Box">
+      <UniqueIdentifier>{e4622eb2-e807-4e41-8634-5f194a3131aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Box\Mesh">
+      <UniqueIdentifier>{2345318b-1b79-4603-988a-4a18a760c025}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Box\Object">
+      <UniqueIdentifier>{a34a944b-ae40-485c-82f0-cf7fbf494bbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Box\Shader">
+      <UniqueIdentifier>{3cdc43cc-ac5d-4101-b53a-6836d51b75c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{c23f2eb1-efd0-4ed0-9f31-eb81bdde93cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL">
+      <UniqueIdentifier>{da5566c1-9a08-4a86-a15e-22099b0df024}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{acb47ef4-6cc7-48a3-a96a-14bbb3a86c1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\TitleScene">
+      <UniqueIdentifier>{bbb7f83c-daa3-4049-bf36-e0efb28f9fbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Scene">
+      <UniqueIdentifier>{0622459b-a503-4209-b976-9b9b195215ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\PositionColor">
+      <UniqueIdentifier>{0ea6d4fa-30fa-4831-8c0e-28dcb5d8bc24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Camera\Camera.h">
+      <Filter>Camera</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>헤더 파일</Filter>
@@ -30,30 +78,108 @@
     <ClInclude Include="DXMain.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\Box\BoxMesh.h">
+      <Filter>GameObject\Box\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Box\BoxObject.h">
+      <Filter>GameObject\Box\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Box\BoxShader.h">
+      <Filter>GameObject\Box\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="HLSL\PositionColor\BindingBufferStructs.h">
+      <Filter>HLSL\PositionColor</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx\stdafx.h">
+      <Filter>미리 컴파일된 헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Framework.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Base\Mesh.h">
+      <Filter>GameObject\Base\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Base\Object.h">
+      <Filter>GameObject\Base\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Base\Shader.h">
+      <Filter>GameObject\Base\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="header\D2D_Operator.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="header\LusWrite.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Scene.h">
+      <Filter>Scene\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Title\TitleScene.h">
+      <Filter>Scene\TitleScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Camera\Camera.cpp">
+      <Filter>Camera</Filter>
     </ClCompile>
     <ClCompile Include="DXMain.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\Box\BoxMesh.cpp">
+      <Filter>GameObject\Box\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Box\BoxObject.cpp">
+      <Filter>GameObject\Box\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Box\BoxShader.cpp">
+      <Filter>GameObject\Box\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx\stdafx.cpp">
+      <Filter>미리 컴파일된 헤더</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Framework.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Base\Mesh.cpp">
+      <Filter>GameObject\Base\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Base\Object.cpp">
+      <Filter>GameObject\Base\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Base\Shader.cpp">
+      <Filter>GameObject\Base\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Scene.cpp">
+      <Filter>Scene\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Title\TitleScene.cpp">
+      <Filter>Scene\TitleScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="DXMain.rc">
+    <None Include="HLSL\PositionColor\PositionColorBufferStructs.hlsli">
+      <Filter>HLSL\PositionColor</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="HLSL\PositionColor\PositionColorPixelShader.hlsl">
+      <Filter>HLSL\PositionColor</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\PositionColor\PositionColorVertexShader.hlsl">
+      <Filter>HLSL\PositionColor</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resource\small.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resource\DXMain.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource\DXMain.rc">
       <Filter>리소스 파일</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="small.ico">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="DXMain.ico">
-      <Filter>리소스 파일</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="VertexShader.hlsl" />
-    <FxCompile Include="PixelShader.hlsl" />
   </ItemGroup>
 </Project>
