@@ -3,7 +3,7 @@
 #include "Objects\Base\Object.h"
 
 bool CLogSystem::m_bCreated = false;
-CMeasureTimeElapsedObserver* CLogSystem::CTimeElapsedObs = nullptr;
+vector<CObserver*> CLogSystem::m_vObservers = {};
 
 CLogSystem::~CLogSystem()
 {
@@ -16,13 +16,18 @@ bool CLogSystem::Initialize(HWND hParentWnd, HINSTANCE hInstance)
 {
 	if (m_bCreated) return false;
 
-	if (CTimeElapsedObs == nullptr) CTimeElapsedObs = new CMeasureTimeElapsedObserver();
+	RegistNotification();
 
 	MyRegisterClass(hInstance);
 
 	if(!CreateLogWindow(hParentWnd, hInstance)) return false;
 
 	CreateBackBuffer();
+
+	auto height = m_rcClient.bottom - m_rcClient.top;
+	int margin = 5;
+
+	m_scroll.initialize(scroll::SCRType::SCR_V, height, height, height - 2 * margin, POINT { m_rcClient.right - margin * 2, m_rcClient.top + margin}, 150, margin);
 
 	// Run Draw Timer
 	SetTimer(m_hWnd, WT_DEBUG_DRWACALL, m_TickFrequency, NULL);
@@ -36,8 +41,12 @@ void CLogSystem::Draw(HDC hdc)
 {
 	FillRect(m_hDCBackBuffer, &m_rcClient, static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH)));
 
-	GetTimeElapsedObserver()->Draw(m_hDCBackBuffer, RECT { 10, 10, m_rcClient.right - 10, m_rcClient.bottom });
+	RECT rc{ 10, 10, m_rcClient.right - 10, m_rcClient.bottom };
 
+	for (auto p : m_vObservers)
+		p->Draw(m_hDCBackBuffer, rc);
+
+	m_scroll.Draw(m_hDCBackBuffer, m_rcClient);
 
 	BitBlt(hdc, 0, 0, m_rcClient.right, m_rcClient.bottom, m_hDCBackBuffer, 0, 0, SRCCOPY);
 }
@@ -172,6 +181,19 @@ void CLogSystem::ReleaseBackBufferResources()
 	}
 }
 
+void CLogSystem::RegistNotification() 
+{
+	m_vObservers.emplace_back(new CMeasureTimeElapsedObserver());
+	m_vObservers.emplace_back(new CCustomLoggerObserver());
+
+}
+
+void CLogSystem::PropagateNotification(const class CObject* obj, Event* pEvent)
+{
+	for (auto p : m_vObservers)
+		p->onNotify(obj, pEvent);
+}
+
 LRESULT CLogSystem::WndProc(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
 	CLogSystem* self = ::GetUserDataPtr<CLogSystem*>(hWnd);
@@ -196,7 +218,9 @@ LRESULT CLogSystem::WndProc(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lP
 		switch (wParam)
 		{
 		case VK_SPACE:
-			self->GetTimeElapsedObserver()->RenewalViewList();
+
+			for(auto p : self->m_vObservers)
+				p->RenewalViewList();
 			break;
 		}
 		break;
@@ -258,7 +282,7 @@ inline void CMeasureTimeElapsedObserver::RenewalViewList()
 	ifs.close();
 }
 
-void CMeasureTimeElapsedObserver::Draw(HDC hdc, RECT rcDrawArea)
+void CMeasureTimeElapsedObserver::Draw(HDC hdc, RECT& rcDrawArea)
 {
 	POINT ptStart { rcDrawArea.left, rcDrawArea.top };
 
@@ -281,9 +305,9 @@ void CMeasureTimeElapsedObserver::Draw(HDC hdc, RECT rcDrawArea)
 			FixValue(maxcount / m_mapFunctionTimeElapsed[p].size()) : L"0")
 			+ L" / " + FixValue(m_mapFunctionTimeElapsed[p].size()) + L" ȸ";
 
-		RECT rc { rcDrawArea.left, rcDrawArea.top + iHeight, rcDrawArea.right, rcDrawArea.bottom };
 
-		iHeight += DrawText(hdc, soutput.c_str(), -1, &rc, DT_LEFT | DT_SINGLELINE);
+		rcDrawArea.top += DrawText(hdc, soutput.c_str(), -1, &rcDrawArea, DT_LEFT | DT_SINGLELINE);
+		
 	}
 
 }
@@ -320,7 +344,7 @@ void CCustomLoggerObserver::RenewalViewList()
 	ifs.close();
 }
 
-void CCustomLoggerObserver::Draw(HDC hdc, RECT rcDrawArea)
+void CCustomLoggerObserver::Draw(HDC hdc, RECT& rcDrawArea)
 {
 	POINT ptStart { rcDrawArea.left, rcDrawArea.top };
 
@@ -338,6 +362,7 @@ void CCustomLoggerObserver::Draw(HDC hdc, RECT rcDrawArea)
 
 		RECT rc { rcDrawArea.left, rcDrawArea.top + iHeight, rcDrawArea.right, rcDrawArea.bottom };
 
-		iHeight += DrawText(hdc, wstr.c_str(), -1, &rc, DT_LEFT | DT_SINGLELINE);
+		rcDrawArea.top += DrawText(hdc, wstr.c_str(), -1, &rcDrawArea, DT_LEFT | DT_SINGLELINE);
+
 	}
 }

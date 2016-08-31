@@ -30,6 +30,10 @@ public:
 
 	virtual ~CObserver() {}
 	virtual void onNotify(const class CObject* obj, Event* _event) = 0;
+	virtual void Draw(HDC hdc, RECT& rcDrawArea) {}
+
+	virtual void RenewalViewList() {}
+
 };
 
 struct Event_MeasureTimeElapsed
@@ -74,7 +78,7 @@ public:
 		m_mapFunctionTimeElapsed[ThisEvent->strTag].emplace_back(ThisEvent->llTimeElapsed);
 	}
 
-	void Draw(HDC hdc, RECT rcDrawArea);
+	void Draw(HDC hdc, RECT& rcDrawArea);
 
 };
 
@@ -120,7 +124,7 @@ public:
 		m_mapStringLogger[ThisEvent->strTag] = ThisEvent->strLog;
 	}
 
-	void Draw(HDC hdc, RECT rcDrawArea);
+	virtual void Draw(HDC hdc, RECT& rcDrawArea);
 
 };
 
@@ -150,6 +154,8 @@ protected:
 	void CreateBackBuffer();
 	void ReleaseBackBufferResources();
 
+	void RegistNotification();
+
 	static bool		m_bCreated;
 
 	HWND			m_hWnd				{ nullptr };
@@ -166,12 +172,15 @@ protected:
 
 	LONG			m_TickFrequency		{ 100 }	;
 
+	scroll_Win32	m_scroll					;
+
 protected:
 
-	static CMeasureTimeElapsedObserver	*CTimeElapsedObs	;
+	// 단, 등록된 Observer에게만 정보를 보냅니다.
+	static vector<CObserver*> m_vObservers;
 
 public:
 
-	static auto* GetTimeElapsedObserver() { return CTimeElapsedObs; }
+	static void PropagateNotification(const class CObject* obj, Event* pEvent);
 
 };

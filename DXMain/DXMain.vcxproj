@@ -26,6 +26,7 @@
     <ClInclude Include="header\D2D_Operator.h" />
     <ClInclude Include="header\LusWrite.h" />
     <ClInclude Include="header\MeasureFunctionTimeElapsed.h" />
+    <ClInclude Include="header\scroll.h" />
     <ClInclude Include="HLSL\PositionColor\BindingBufferStructs.h" />
     <ClInclude Include="Objects\Base\Mesh.h" />
     <ClInclude Include="Objects\Base\Object.h" />
