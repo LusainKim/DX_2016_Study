@@ -64,6 +64,9 @@
     <Filter Include="HLSL\PositionColor">
       <UniqueIdentifier>{0ea6d4fa-30fa-4831-8c0e-28dcb5d8bc24}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Framework\LogSystem">
+      <UniqueIdentifier>{ca82c3a0-c338-44c2-8212-0d4ddd4a2dbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera\Camera.h">
@@ -120,6 +123,9 @@
     <ClInclude Include="header\MeasureFunctionTimeElapsed.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Framework\LogSystem\LogSystem.h">
+      <Filter>Framework\LogSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera\Camera.cpp">
@@ -157,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="Scene\Title\TitleScene.cpp">
       <Filter>Scene\TitleScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\LogSystem\LogSystem.cpp">
+      <Filter>Framework\LogSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
