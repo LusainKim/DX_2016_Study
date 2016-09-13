@@ -95,8 +95,11 @@ public:
 		if (ThumbLength != 0)
 			m_flThumb = ThumbLength;
 		else
+		{
 			m_flThumb = max(5, ScrollLength * m_flSrcView / m_flSrc);
-
+			if (m_flSrcView / m_flSrc >= 1)
+				m_flThumb = 0;
+		}
 		m_flScroll = ScrollLength - 2 * m_flThumb;
 
 		m_flThickness = thickness;
@@ -280,6 +283,8 @@ public:
 	*/
 	virtual bool OnProcessingMouseMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+		if (m_flThumb < 1.f) return false;
+
 		POINT pt = { LOWORD(lParam), HIWORD(lParam) };
 		switch (uMsg)
 		{
@@ -477,6 +482,8 @@ public:
 	*/
 	virtual bool OnProcessingMouseMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+		if (m_flThumb < 1.f) return false;
+
 		D2D_POINT_2F pt = Point2F(LOWORD(lParam), HIWORD(lParam));
 		switch (uMsg)
 		{

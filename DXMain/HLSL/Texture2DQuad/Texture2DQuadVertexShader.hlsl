@@ -1,5 +1,5 @@
 #include "..\BindingBuffer.hlsli"
-#include "PositionColorBufferStructs.hlsli"
+#include "Texture2DQuadBufferStruct.hlsli"
 
 PixelShaderInput main(VertexShaderInput input)
 {
@@ -13,7 +13,7 @@ PixelShaderInput main(VertexShaderInput input)
 	output.pos = pos;
 
 	// 수정 없이 색을 통과합니다.
-	output.color = input.color;
+	output.texcoord = input.texcoord;
 
 	return output;
 }

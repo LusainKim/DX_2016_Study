@@ -27,7 +27,7 @@ bool CLogSystem::Initialize(HWND hParentWnd, HINSTANCE hInstance)
 	auto height = m_rcClient.bottom - m_rcClient.top;
 	int margin = 5;
 
-	m_scroll.initialize(scroll::SCRType::SCR_V, height, height, height - 2 * margin, POINT { m_rcClient.right - margin * 2, m_rcClient.top + margin}, 150, margin);
+	m_scroll.initialize(scroll::SCRType::SCR_V, height, height, height - 2 * margin, POINT { m_rcClient.right - margin * 2, m_rcClient.top + margin}, 150, 0, margin);
 
 	// Run Draw Timer
 	SetTimer(m_hWnd, WT_DEBUG_DRWACALL, m_TickFrequency, NULL);
@@ -223,6 +223,12 @@ LRESULT CLogSystem::WndProc(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lP
 				p->RenewalViewList();
 			break;
 		}
+		break;
+
+	case WM_MOUSEMOVE:
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+		self->m_scroll.OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
 		break;
 
 	case WM_TIMER:

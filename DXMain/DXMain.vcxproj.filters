@@ -67,6 +67,9 @@
     <Filter Include="Framework\LogSystem">
       <UniqueIdentifier>{ca82c3a0-c338-44c2-8212-0d4ddd4a2dbd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HLSL\Texture2DQuad">
+      <UniqueIdentifier>{6179d3a7-67ca-45d4-b0e4-902f0b19b000}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera\Camera.h">
@@ -89,9 +92,6 @@
     </ClInclude>
     <ClInclude Include="Objects\Box\BoxShader.h">
       <Filter>GameObject\Box\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="HLSL\PositionColor\BindingBufferStructs.h">
-      <Filter>HLSL\PositionColor</Filter>
     </ClInclude>
     <ClInclude Include="stdafx\stdafx.h">
       <Filter>미리 컴파일된 헤더</Filter>
@@ -128,6 +128,12 @@
     </ClInclude>
     <ClInclude Include="header\scroll.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HLSL\PositionColor\BindingBufferStructs.h">
+      <Filter>HLSL</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Base\Meterial.h">
+      <Filter>GameObject\Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -170,10 +176,19 @@
     <ClCompile Include="Framework\LogSystem\LogSystem.cpp">
       <Filter>Framework\LogSystem</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\Base\Meterial.cpp">
+      <Filter>GameObject\Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\PositionColor\PositionColorBufferStructs.hlsli">
       <Filter>HLSL\PositionColor</Filter>
+    </None>
+    <None Include="HLSL\Texture2DQuad\Texture2DQuadBufferStruct.hlsli">
+      <Filter>HLSL\Texture2DQuad</Filter>
+    </None>
+    <None Include="HLSL\BindingBuffer.hlsli">
+      <Filter>HLSL</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -182,6 +197,12 @@
     </FxCompile>
     <FxCompile Include="HLSL\PositionColor\PositionColorVertexShader.hlsl">
       <Filter>HLSL\PositionColor</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\Texture2DQuad\Texture2DQuadVertexShader.hlsl">
+      <Filter>HLSL\Texture2DQuad</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\Texture2DQuad\Texture2DQuadPixelShader.hlsl">
+      <Filter>HLSL\Texture2DQuad</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
