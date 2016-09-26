@@ -15,21 +15,31 @@ public:
 
 class CTextureBase
 {
+
 public:
+
+	enum class TextureType : byte {
+		none
+		, Render
+		, File
+		, count
+	};
+	
+
+protected:
+	
+	TextureType m_texType = TextureType::none;
+
+public:
+	
+	TextureType GetTextureType() const { return m_texType; }
+
+public:
+
 	CTextureBase() = default;
 	virtual ~CTextureBase() = default;
 	
-	static ID3D11Buffer				*m_pd3dcbTextureMatrix;
 
-	virtual void SetTexture(int nIndex, ID3D11ShaderResourceView *pd3dsrvTexture) = 0;
-	virtual void SetSampler(int nIndex, ID3D11SamplerState *pd3dSamplerState) = 0;
-	virtual void UpdateShaderVariable(ID3D11DeviceContext *pd3dDeviceContext) = 0;
-	virtual void UpdateTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, int nIndex = 0, int nSlot = 0) = 0;
-	virtual void UpdateSamplerShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, int nIndex = 0, int nSlot = 0) = 0;
-	
-	static void CreateShaderVariables(ID3D11Device *pd3dDevice);
-	static void ReleaseShaderVariables();
-	static void UpdateShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, XMMATRIX *pd3dxmtxTexture);
 	static ID3D11ShaderResourceView *CreateRandomTexture1DSRV(ID3D11Device *pd3dDevice);
 	
 	/// <summary>
@@ -117,6 +127,8 @@ public:
 
 private:
 
+	static ID3D11Buffer				*m_pd3dcbTextureMatrix;
+
 	vector<ID3D11ShaderResourceView*>	m_ppd3dsrvTextures;
 	int									m_nTextureStartSlot;
 
@@ -127,9 +139,13 @@ public:
 
 	virtual void SetTexture(int nIndex, ID3D11ShaderResourceView *pd3dsrvTexture);
 	virtual void SetSampler(int nIndex, ID3D11SamplerState *pd3dSamplerState);
-	virtual void UpdateShaderVariable(ID3D11DeviceContext *pd3dDeviceContext);
-	virtual void UpdateTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, int nIndex = 0, int nSlot = 0);
-	virtual void UpdateSamplerShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, int nIndex = 0, int nSlot = 0);
+	virtual void UpdateTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext);
+	virtual void UpdateTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, int nIndex, int nSlot);
+	virtual void UpdateSamplerShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, int nIndex, int nSlot);
+
+	static void CreateShaderVariables(ID3D11Device *pd3dDevice);
+	static void ReleaseShaderVariables();
+	static void UpdateAnimationTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, XMMATRIX *pd3dxmtxTexture);
 
 };
 
@@ -138,29 +154,59 @@ class CTextureDrawable : public CTextureBase
 {
 public:
 
-#define Assert_CTextureDrawable(nIndex, nSlot) \
-assert(		(nIndex == 0 && nSlot == 0) \
-		&& "CTextureRenderable는 무조건 하나의 indext와 slot을 가집니다!")
-
-	CTextureDrawable() = default;
+	CTextureDrawable(	  IWICImagingFactory* pwicFactory
+						, IDWriteFactory *pdwFactory
+						, ID3D11Device* pd3dDevice
+						, ID2D1Factory* pd2dFactory
+						, UINT width
+						, UINT height
+						, DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN
+	);
 	virtual ~CTextureDrawable();
 
 protected:
 	
-
 	ID2D1RenderTarget			*	m_pd2dRenderTarget		{ nullptr }	;
 	ID3D11Texture2D				*	m_pd3dTex2dDrawable		{ nullptr }	;
 	ID3D11ShaderResourceView	*	m_pd3dsrvTexture		{ nullptr }	;
+	IDWriteFactory				*	m_pdwFactory			{ nullptr }	;
 	IWICImagingFactory			*	m_pwicFactory			{ nullptr }	;
+	ID3D11SamplerState			*	m_pd3dSamplerState		{ nullptr }	;
+public:
+
+	virtual void SetSampler(ID3D11SamplerState *pd3dSamplerState);
+	virtual void Render2D(CObject* obj) = 0;
+};
+
+
+
+class CTextureDrawHP : public CTextureDrawable
+{
+public:
+
+	CTextureDrawHP(	  IWICImagingFactory* pwicFactory
+					, IDWriteFactory *pdwFactory
+					, ID3D11Device* pd3dDevice
+					, ID2D1Factory* pd2dFactory
+					, UINT width
+					, UINT height
+					
+					, DXGI_FORMAT format = DXGI_FORMAT_B8G8R8A8_UNORM
+	);
+	virtual ~CTextureDrawHP();
+
+protected:
+
+	ID2D1SolidColorBrush	*	m_pd2dsbrHPBar	{ nullptr }	;
+	ID2D1SolidColorBrush	*	m_pd2dsbrHPGage	{ nullptr }	;
+	IDWriteTextFormat		*	m_pdwTextFormat	{ nullptr }	;
+
+	D2D_RECT_F					m_rcHPBar;
+	D2D_RECT_F					m_rcWriteID;
 
 public:
 
-	virtual void SetTexture(int nIndex, ID3D11ShaderResourceView *pd3dsrvTexture);
-	virtual void SetSampler(int nIndex, ID3D11SamplerState *pd3dSamplerState);
-	virtual void UpdateShaderVariable(ID3D11DeviceContext *pd3dDeviceContext);
-	virtual void UpdateTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, int nIndex = 0, int nSlot = 0);
-	virtual void UpdateSamplerShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, int nIndex = 0, int nSlot = 0);
-
+	virtual void Render2D(CObject* obj);
 };
 
 class CMaterial
@@ -171,8 +217,8 @@ public:
 
 public:
 	void SetTexture(shared_ptr<CTexture> pTexture);
-	void UpdateShaderVariable(ID3D11DeviceContext *pd3dDeviceContext);
+	void UpdateTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, CObject* obj);
 
 	std::shared_ptr<CMaterialColors>	m_pColors;
-	std::shared_ptr<CTexture>			m_pTexture;
+	std::shared_ptr<CTextureBase>		m_pTexture;
 };

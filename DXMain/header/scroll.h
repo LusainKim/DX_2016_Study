@@ -223,7 +223,7 @@ public:
 	*/
 	bool TouchCheck(POINT pt, float ScrollmoveLength = 10.f)
 	{
-		float pos = ((m_scType == SCRType::SCR_H) ? pt.x - m_ptWorldPosition.x : pt.y - m_ptWorldPosition.y);
+		auto pos = static_cast<float>((m_scType == SCRType::SCR_H) ? pt.x - m_ptWorldPosition.x : pt.y - m_ptWorldPosition.y);
 		if (PtInRect(&m_rcThumb, pt))
 		{
 			SetGrip(pos);
@@ -296,7 +296,7 @@ public:
 		case WM_MOUSEMOVE:
 			if (m_bOnClick)
 			{
-				if (!Drag(((m_scType == SCRType::SCR_H) ? pt.x - m_ptWorldPosition.x : pt.y - m_ptWorldPosition.y)))
+				if (!Drag(static_cast<float>((m_scType == SCRType::SCR_H) ? pt.x - m_ptWorldPosition.x : pt.y - m_ptWorldPosition.y)))
 					if (PtInRect(&m_rcScroll, pt))
 					{
 						if (((m_scType == SCRType::SCR_H) ? pt.x - m_ptWorldPosition.x : pt.y - m_ptWorldPosition.y) > m_flThumb + m_fnowScrollpos)

@@ -22,87 +22,6 @@ CMaterialColors::~CMaterialColors()
 
 ///////////////////////////////////////////////////////////////////////////
 //
-ID3D11Buffer *CTextureBase::m_pd3dcbTextureMatrix = nullptr;
-
-CTexture::CTexture(int nTextures, int nSamplers, int nTextureStartSlot, int nSamplerStartSlot)
-{
-	m_ppd3dsrvTextures.resize(nTextures, nullptr);
-	m_nTextureStartSlot = nTextureStartSlot;
-
-	m_ppd3dSamplerStates.resize(nSamplers, nullptr);
-	m_nSamplerStartSlot = nSamplerStartSlot;
-}
-
-CTexture::~CTexture()
-{
-	for (auto p : m_ppd3dsrvTextures) SafeRelease(p);
-	for (auto p : m_ppd3dSamplerStates) SafeRelease(p);
-}
-
-void CTexture::SetTexture(int nIndex, ID3D11ShaderResourceView *pd3dsrvTexture)
-{
-	if (m_ppd3dsrvTextures[nIndex]) m_ppd3dsrvTextures[nIndex]->Release();
-	m_ppd3dsrvTextures[nIndex] = pd3dsrvTexture;
-	if (pd3dsrvTexture) pd3dsrvTexture->AddRef();
-}
-
-void CTexture::SetSampler(int nIndex, ID3D11SamplerState *pd3dSamplerState)
-{
-	if (m_ppd3dSamplerStates[nIndex]) m_ppd3dSamplerStates[nIndex]->Release();
-	m_ppd3dSamplerStates[nIndex] = pd3dSamplerState;
-	if (pd3dSamplerState) pd3dSamplerState->AddRef();
-}
-
-void CTexture::UpdateShaderVariable(ID3D11DeviceContext *pd3dDeviceContext)
-{
-	pd3dDeviceContext->PSSetShaderResources(	  m_nTextureStartSlot
-												, static_cast<UINT>(m_ppd3dsrvTextures.size())
-												, &(m_ppd3dsrvTextures[0]));
-
-	pd3dDeviceContext->PSSetSamplers(			  m_nSamplerStartSlot
-												, static_cast<UINT>(m_ppd3dSamplerStates.size())
-												, &(m_ppd3dSamplerStates[0]));
-}
-
-void CTexture::UpdateTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, int nIndex, int nSlot)
-{
-	pd3dDeviceContext->PSSetShaderResources(nSlot, 1, &m_ppd3dsrvTextures[nIndex]);
-}
-
-void CTexture::UpdateSamplerShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, int nIndex, int nSlot)
-{
-	pd3dDeviceContext->PSSetSamplers(nSlot, 1, &m_ppd3dSamplerStates[nIndex]);
-}
-
-void CTextureBase::CreateShaderVariables(ID3D11Device *pd3dDevice)
-{
-	CD3D11_BUFFER_DESC d3dBufferDesc(sizeof(XMMATRIX), D3D11_BIND_CONSTANT_BUFFER);
-	pd3dDevice->CreateBuffer(&d3dBufferDesc, NULL, &m_pd3dcbTextureMatrix);
-}
-
-void CTextureBase::ReleaseShaderVariables()
-{
-	if (m_pd3dcbTextureMatrix) m_pd3dcbTextureMatrix->Release();
-}
-
-// for animation texture
-void CTextureBase::UpdateShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, XMMATRIX *pd3dxmtxTexture)
-{
-	return;
-
-	// 그래픽 장치로 보낼 수 있도록 상수 버퍼를 준비합니다.
-	pd3dDeviceContext->UpdateSubresource(	  m_pd3dcbTextureMatrix
-											, 0
-											, NULL
-											, pd3dxmtxTexture
-											, 0
-											, 0
-	);
-
-	auto VS_CB_SLOT_TEXTURE_MATRIX = 2;
-	pd3dDeviceContext->VSSetConstantBuffers(VS_CB_SLOT_TEXTURE_MATRIX, 1, &m_pd3dcbTextureMatrix);
-}
-
 ID3D11ShaderResourceView *CTextureBase::CreateRandomTexture1DSRV(ID3D11Device *pd3dDevice)
 {
 	auto RANDOMCOLOR = [] (float min, float max)
@@ -137,37 +56,191 @@ ID3D11ShaderResourceView *CTextureBase::CreateRandomTexture1DSRV(ID3D11Device *p
 
 ///////////////////////////////////////////////////////////////////////////
 //
+ID3D11Buffer *CTexture::m_pd3dcbTextureMatrix = nullptr;
+
+CTexture::CTexture(int nTextures, int nSamplers, int nTextureStartSlot, int nSamplerStartSlot)
+{
+	m_texType = TextureType::File;
+
+	m_ppd3dsrvTextures.resize(nTextures, nullptr);
+	m_nTextureStartSlot = nTextureStartSlot;
+
+	m_ppd3dSamplerStates.resize(nSamplers, nullptr);
+	m_nSamplerStartSlot = nSamplerStartSlot;
+}
+
+CTexture::~CTexture()
+{
+	for (auto p : m_ppd3dsrvTextures) SafeRelease(p);
+	for (auto p : m_ppd3dSamplerStates) SafeRelease(p);
+}
+
+// Texture 연결
+void CTexture::SetTexture(int nIndex, ID3D11ShaderResourceView *pd3dsrvTexture)
+{
+	assert(nIndex > m_ppd3dsrvTextures.size() && "Index가 허용 범위를 넘었습니다!");
+	
+	if (pd3dsrvTexture) pd3dsrvTexture->AddRef();
+	
+	if (nIndex == m_ppd3dsrvTextures.size()) { m_ppd3dsrvTextures.push_back(pd3dsrvTexture); return; }
+
+	if (m_ppd3dsrvTextures[nIndex]) m_ppd3dsrvTextures[nIndex]->Release();
+	m_ppd3dsrvTextures[nIndex] = pd3dsrvTexture;
+}
+
+// Sampler에 연결
+void CTexture::SetSampler(int nIndex, ID3D11SamplerState *pd3dSamplerState)
+{
+	assert(nIndex > m_ppd3dSamplerStates.size() && "Index가 허용 범위를 넘었습니다!");
+
+	if (pd3dSamplerState) pd3dSamplerState->AddRef();
+
+	if (nIndex == m_ppd3dSamplerStates.size()) { m_ppd3dSamplerStates.push_back(pd3dSamplerState); return; }
+
+	if (m_ppd3dSamplerStates[nIndex]) m_ppd3dSamplerStates[nIndex]->Release();
+	m_ppd3dSamplerStates[nIndex] = pd3dSamplerState;
+}
+
+// 모든 SRV와 Sampler를 연결
+void CTexture::UpdateTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext)
+{
+	pd3dDeviceContext->PSSetShaderResources(	  m_nTextureStartSlot
+												, static_cast<UINT>(m_ppd3dsrvTextures.size())
+												, &(m_ppd3dsrvTextures[0]));
+
+	pd3dDeviceContext->PSSetSamplers(			  m_nSamplerStartSlot
+												, static_cast<UINT>(m_ppd3dSamplerStates.size())
+												, &(m_ppd3dSamplerStates[0]));
+}
+
+// SRV 하나 연결
+void CTexture::UpdateTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, int nIndex, int nSlot)
+{
+	pd3dDeviceContext->PSSetShaderResources(nSlot, 1, &m_ppd3dsrvTextures[nIndex]);
+}
+
+// Sampler 하나 연결
+void CTexture::UpdateSamplerShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, int nIndex, int nSlot)
+{
+	pd3dDeviceContext->PSSetSamplers(nSlot, 1, &m_ppd3dSamplerStates[nIndex]);
+}
+
+// for animation texture
+void CTexture::CreateShaderVariables(ID3D11Device *pd3dDevice)
+{
+	CD3D11_BUFFER_DESC d3dBufferDesc(sizeof(XMMATRIX), D3D11_BIND_CONSTANT_BUFFER);
+	pd3dDevice->CreateBuffer(&d3dBufferDesc, NULL, &m_pd3dcbTextureMatrix);
+}
+
+// for animation texture
+void CTexture::ReleaseShaderVariables()
+{
+	if (m_pd3dcbTextureMatrix) m_pd3dcbTextureMatrix->Release();
+}
+
+// for animation texture
+void CTexture::UpdateAnimationTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, XMMATRIX *pd3dxmtxTexture)
+{
+	return;
+
+	// 그래픽 장치로 보낼 수 있도록 상수 버퍼를 준비합니다.
+	pd3dDeviceContext->UpdateSubresource(	  m_pd3dcbTextureMatrix
+											, 0
+											, NULL
+											, pd3dxmtxTexture
+											, 0
+											, 0
+	);
+
+	auto VS_CB_SLOT_TEXTURE_MATRIX = 2;
+	pd3dDeviceContext->VSSetConstantBuffers(VS_CB_SLOT_TEXTURE_MATRIX, 1, &m_pd3dcbTextureMatrix);
+}
+
+///////////////////////////////////////////////////////////////////////////
+//
+CTextureDrawable::CTextureDrawable(IWICImagingFactory* pwicFactory, IDWriteFactory *pdwFactory, ID3D11Device* pd3dDevice, ID2D1Factory* pd2dDevice, UINT width, UINT height, DXGI_FORMAT format)
+{
+	m_texType = TextureType::Render;
+	
+	m_pwicFactory = pwicFactory;
+	if (m_pwicFactory) m_pwicFactory->AddRef();
+
+	m_pdwFactory = pdwFactory;
+	if (m_pdwFactory) m_pdwFactory->AddRef();
+
+	Create2DTexture(pd3dDevice, pd2dDevice, &m_pd3dTex2dDrawable, &m_pd2dRenderTarget, width, height, format);
+}
+
 CTextureDrawable::~CTextureDrawable()
 {
 	SafeRelease(m_pd2dRenderTarget);
 	SafeRelease(m_pd3dTex2dDrawable);
 	SafeRelease(m_pd3dsrvTexture);
 	SafeRelease(m_pwicFactory);
+	SafeRelease(m_pdwFactory);
+	SafeRelease(m_pd3dSamplerState);
 }
 
-void CTextureDrawable::SetTexture(int nIndex, ID3D11ShaderResourceView * pd3dsrvTexture)
+void CTextureDrawable::SetSampler(ID3D11SamplerState * pd3dSamplerState)
 {
+	SafeRelease(m_pd3dSamplerState);
+	m_pd3dSamplerState = pd3dSamplerState;
+	pd3dSamplerState->AddRef();
 }
 
-void CTextureDrawable::SetSampler(int nIndex, ID3D11SamplerState * pd3dSamplerState)
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+CTextureDrawHP::CTextureDrawHP(IWICImagingFactory* pwicFactory, IDWriteFactory *pdwFactory, ID3D11Device* pd3dDevice, ID2D1Factory* pd2dFactory, UINT width, UINT height, DXGI_FORMAT format)
+	: CTextureDrawable(pwicFactory, pdwFactory, pd3dDevice, pd2dFactory, width, height, format)
 {
+	m_pd2dRenderTarget->CreateSolidColorBrush(ColorF(ColorF::DimGray), &m_pd2dsbrHPBar);
+	m_pd2dRenderTarget->CreateSolidColorBrush(ColorF(ColorF::Crimson), &m_pd2dsbrHPGage);
+
+	m_pdwFactory->CreateTextFormat(L"Arial"
+		, nullptr
+		, DWRITE_FONT_WEIGHT_NORMAL
+		, DWRITE_FONT_STYLE_NORMAL
+		, DWRITE_FONT_STRETCH_NORMAL
+		, width * 0.5f
+		, L"ko-kr"
+		, reinterpret_cast<IDWriteTextFormat**>(&m_pdwTextFormat)
+	);
+
+	float fWidth = static_cast<float>(width);
+	float fHeight = static_cast<float>(height);
+	m_rcHPBar = RectF(fWidth * 0.25f, fHeight * 0.3f, fWidth, fHeight * 0.7f);
+	m_rcWriteID = RectF(0, 0, fWidth * 0.25f, fHeight);
 }
 
-void CTextureDrawable::UpdateShaderVariable(ID3D11DeviceContext * pd3dDeviceContext)
+CTextureDrawHP::~CTextureDrawHP()
 {
+	SafeRelease(m_pd2dsbrHPBar);
+	SafeRelease(m_pd2dsbrHPGage);
 }
 
-void CTextureDrawable::UpdateTextureShaderVariable(ID3D11DeviceContext * pd3dDeviceContext, int nIndex, int nSlot)
+#include "Objects\Box\BoxObject.h"
+
+void CTextureDrawHP::Render2D(CObject * obj)
 {
-	Assert_CTextureDrawable(nIndex, nSlot);
-}
+	auto Object = static_cast<CBoxObject*>(obj);
+	assert(Object && "Error!");
 
-void CTextureDrawable::UpdateSamplerShaderVariable(ID3D11DeviceContext * pd3dDeviceContext, int nIndex, int nSlot)
-{
-	Assert_CTextureDrawable(nIndex, nSlot);
+	wstring strID = to_wstring(Object->GetID());
 
+	m_pd2dRenderTarget->BeginDraw();
 
+	m_pd2dRenderTarget->DrawText(strID.c_str(), static_cast<UINT>(strID.length()), m_pdwTextFormat, m_rcWriteID, m_pd2dsbrHPBar);
+	m_pd2dRenderTarget->FillRectangle(m_rcHPBar, m_pd2dsbrHPBar);
+	
+	D2D_RECT_F rcCurrent = m_rcHPBar;
+	float fCurrentPBar = (m_rcHPBar.right - m_rcHPBar.left) * 0.7f;
+	rcCurrent.right = rcCurrent.left += fCurrentPBar;
 
+	m_pd2dRenderTarget->FillRectangle(rcCurrent, m_pd2dsbrHPGage);
+
+	m_pd2dRenderTarget->EndDraw();
 }
 
 
@@ -188,9 +261,28 @@ void CMaterial::SetTexture(shared_ptr<CTexture> pTexture)
 	m_pTexture = pTexture;
 }
 
-void CMaterial::UpdateShaderVariable(ID3D11DeviceContext *pd3dDeviceContext)
+void CMaterial::UpdateTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, CObject* obj)
 {
-//	작업중
-//	if (m_pColors) CObject::UpdateShaderVariable(pd3dDeviceContext, m_pColors.get());
-	if (m_pTexture) m_pTexture->UpdateShaderVariable(pd3dDeviceContext);
+	if (!m_pTexture) return;
+	//	작업중
+	//	if (m_pColors) CObject::UpdateShaderVariable(pd3dDeviceContext, m_pColors.get());
+	switch (m_pTexture->GetTextureType())
+	{
+	case CTextureBase::TextureType::File:
+		{
+			auto pTexture = static_cast<CTexture*>(m_pTexture.get());
+			if (pTexture) pTexture->UpdateTextureShaderVariable(pd3dDeviceContext);
+		}
+		break;
+	case CTextureBase::TextureType::Render:
+		{
+			auto pTexture = static_cast<CTextureDrawable*>(m_pTexture.get());
+			if (pTexture) pTexture->Render2D(obj);
+		}
+		break;
+	default:
+		assert(!"Error!");
+	}
+
+
 }
