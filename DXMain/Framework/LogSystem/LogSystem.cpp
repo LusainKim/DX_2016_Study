@@ -32,7 +32,12 @@ bool CLogSystem::Initialize(HWND hParentWnd, HINSTANCE hInstance)
 	// Run Draw Timer
 	SetTimer(m_hWnd, WT_DEBUG_DRWACALL, m_TickFrequency, NULL);
 
+	// 클래스와 윈도우 프로시저 연결
+	::SetUserDataPtr(m_hWnd, this);
 
+	//	윈도우 표시
+	ShowWindow(m_hWnd, SW_SHOW);
+	UpdateWindow(m_hWnd);
 
 	return m_bCreated = true;
 }
@@ -139,12 +144,6 @@ bool CLogSystem::CreateLogWindow(HWND hParentWnd, HINSTANCE hInstance)
 		return false;
 	}
 
-	// 클래스와 윈도우 프로시저 연결
-	::SetUserDataPtr(m_hWnd, this);
-
-	//	윈도우 표시
-	ShowWindow(m_hWnd, SW_SHOW);
-	UpdateWindow(m_hWnd);
 	return true;
 }
 

@@ -367,7 +367,7 @@ class D2D_SRCOLL : public basic_scroll {
 	{
 		RECT win32rc = { (LONG) rc->left, (LONG) rc->top, (LONG) rc->right, (LONG) rc->bottom };
 		POINT win32pt = { (LONG) pt.x, (LONG) pt.y };
-		return static_cast<bool>(::PtInRect(&win32rc, win32pt));
+		return static_cast<bool>(::PtInRect(&win32rc, win32pt) == TRUE);
 	}
 
 protected:

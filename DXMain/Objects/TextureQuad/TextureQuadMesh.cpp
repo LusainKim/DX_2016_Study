@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "Objects\Base\Mesh.h"
 #include "TextureQuadMesh.h"
 
 CTexture2DQuad::CTexture2DQuad(ID3D11Device * pd3dDevice, float fWidth, float fHeight)
