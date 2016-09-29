@@ -169,6 +169,19 @@ CTextureDrawable::CTextureDrawable(IWICImagingFactory* pwicFactory, IDWriteFacto
 	if (m_pdwFactory) m_pdwFactory->AddRef();
 
 	Create2DTexture(pd3dDevice, pd2dDevice, &m_pd3dTex2dDrawable, &m_pd2dRenderTarget, width, height, format);
+	
+	D3D11_SAMPLER_DESC d3dSamplerDesc;
+	ZeroMemory(&d3dSamplerDesc, sizeof(D3D11_SAMPLER_DESC));
+	d3dSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	d3dSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	d3dSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	d3dSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	d3dSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	d3dSamplerDesc.MinLOD = 0;
+	d3dSamplerDesc.MaxLOD = 0;
+
+	pd3dDevice->CreateSamplerState(&d3dSamplerDesc, &m_pd3dSamplerState);
+	pd3dDevice->CreateShaderResourceView(m_pd3dTex2dDrawable, NULL, &m_pd3dsrvTexture);
 }
 
 CTextureDrawable::~CTextureDrawable()
@@ -188,6 +201,18 @@ void CTextureDrawable::SetSampler(ID3D11SamplerState * pd3dSamplerState)
 	pd3dSamplerState->AddRef();
 }
 
+void CTextureDrawable::UpdateTextureShaderVariable(ID3D11DeviceContext * pd3dDeviceContext)
+{
+	pd3dDeviceContext->PSSetShaderResources(	  10
+												, 1
+												, &m_pd3dsrvTexture);
+
+	pd3dDeviceContext->PSSetSamplers(			  10
+												, 1
+												, &m_pd3dSamplerState);
+
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -203,14 +228,15 @@ CTextureDrawHP::CTextureDrawHP(IWICImagingFactory* pwicFactory, IDWriteFactory *
 		, DWRITE_FONT_WEIGHT_NORMAL
 		, DWRITE_FONT_STYLE_NORMAL
 		, DWRITE_FONT_STRETCH_NORMAL
-		, width * 0.5f
+		, width * 0.15f
 		, L"ko-kr"
 		, reinterpret_cast<IDWriteTextFormat**>(&m_pdwTextFormat)
 	);
-
+	m_pdwTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+	m_pdwTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	float fWidth = static_cast<float>(width);
 	float fHeight = static_cast<float>(height);
-	m_rcHPBar = RectF(fWidth * 0.25f, fHeight * 0.3f, fWidth, fHeight * 0.7f);
+	m_rcHPBar = RectF(fWidth * 0.25f, fHeight * 0.3f, fWidth * 0.95f, fHeight * 0.7f);
 	m_rcWriteID = RectF(0, 0, fWidth * 0.25f, fHeight);
 }
 
@@ -230,13 +256,13 @@ void CTextureDrawHP::Render2D(CObject * obj)
 	wstring strID = to_wstring(Object->GetID());
 
 	m_pd2dRenderTarget->BeginDraw();
-
+	m_pd2dRenderTarget->Clear(ColorF(0.f,0.f,0.f,0.f));
 	m_pd2dRenderTarget->DrawText(strID.c_str(), static_cast<UINT>(strID.length()), m_pdwTextFormat, m_rcWriteID, m_pd2dsbrHPBar);
 	m_pd2dRenderTarget->FillRectangle(m_rcHPBar, m_pd2dsbrHPBar);
 	
 	D2D_RECT_F rcCurrent = m_rcHPBar;
 	float fCurrentPBar = (m_rcHPBar.right - m_rcHPBar.left) * 0.7f;
-	rcCurrent.right = rcCurrent.left += fCurrentPBar;
+	rcCurrent.right = rcCurrent.left + fCurrentPBar;
 
 	m_pd2dRenderTarget->FillRectangle(rcCurrent, m_pd2dsbrHPGage);
 

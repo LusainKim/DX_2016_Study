@@ -19,7 +19,7 @@ class CTextureBase
 public:
 
 	enum class TextureType : byte {
-		none
+		  none
 		, Render
 		, File
 		, count
@@ -103,7 +103,7 @@ public:
 			// surface. Given that we use a constant size for the texture.
 			D2D1_RENDER_TARGET_PROPERTIES props =
 				RenderTargetProperties(	D2D1_RENDER_TARGET_TYPE_DEFAULT
-						, PixelFormat(	DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED)
+						, PixelFormat(format, D2D1_ALPHA_MODE_PREMULTIPLIED)
 						, fdpiX
 						, fdpiY
 				);
@@ -175,6 +175,7 @@ protected:
 public:
 
 	virtual void SetSampler(ID3D11SamplerState *pd3dSamplerState);
+	virtual void UpdateTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext);
 	virtual void Render2D(CObject* obj) = 0;
 };
 
@@ -191,7 +192,7 @@ public:
 					, UINT width
 					, UINT height
 					
-					, DXGI_FORMAT format = DXGI_FORMAT_B8G8R8A8_UNORM
+					, DXGI_FORMAT format = DXGI_FORMAT_R32G32B32A32_FLOAT
 	);
 	virtual ~CTextureDrawHP();
 

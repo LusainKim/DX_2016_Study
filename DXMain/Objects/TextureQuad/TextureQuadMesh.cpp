@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "TextureQuadMesh.h"
 
-CTexture2DQuad::CTexture2DQuad(ID3D11Device * pd3dDevice, float fWidth, float fHeight)
+CTextureQuadMesh::CTextureQuadMesh(ID3D11Device * pd3dDevice, float fWidth, float fHeight)
 	: CMesh()
 {
 	m_d3dPrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
@@ -35,7 +35,7 @@ CTexture2DQuad::CTexture2DQuad(ID3D11Device * pd3dDevice, float fWidth, float fH
 
 }
 
-int CTexture2DQuad::CheckRayIntersection(FXMVECTOR xmvRayPosition, FXMVECTOR xmvRayDirection, MESHINTERSECTINFO * pd3dxIntersectInfo)
+int CTextureQuadMesh::CheckRayIntersection(FXMVECTOR xmvRayPosition, FXMVECTOR xmvRayDirection, MESHINTERSECTINFO * pd3dxIntersectInfo)
 {
 	return 0;
 
