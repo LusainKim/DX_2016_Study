@@ -7,6 +7,9 @@ CTextureQuadObject::CTextureQuadObject(ID3D11Device * pd3dDevice, float width, f
 {
 	m_Shader.CreateVertexShaderAndInputLayout(LOADSCOPATH("Texture2DQuadVertexShader.cso"), pd3dDevice);
 	m_Shader.CreatePixelShader(LOADSCOPATH("Texture2DQuadPixelShader.cso"), pd3dDevice);
+
+//	CreateBlendState(pd3dDevice);
+	CreateRasterizerState(pd3dDevice, D3D11_CULL_NONE);
 }
 
 void CTextureQuadObject::Update(float fTimeElapsed, const XMMATRIX& xmmtxObject, FXMVECTOR xmvPosition)

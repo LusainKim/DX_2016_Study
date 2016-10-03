@@ -168,9 +168,11 @@ protected:
 	
 	ID2D1RenderTarget			*	m_pd2dRenderTarget		{ nullptr }	;
 	ID3D11Texture2D				*	m_pd3dTex2dDrawable		{ nullptr }	;
-	ID3D11ShaderResourceView	*	m_pd3dsrvTexture		{ nullptr }	;
+
 	IDWriteFactory				*	m_pdwFactory			{ nullptr }	;
 	IWICImagingFactory			*	m_pwicFactory			{ nullptr }	;
+
+	ID3D11ShaderResourceView	*	m_pd3dsrvTexture		{ nullptr }	;
 	ID3D11SamplerState			*	m_pd3dSamplerState		{ nullptr }	;
 public:
 
