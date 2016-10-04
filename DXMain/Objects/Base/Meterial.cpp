@@ -220,29 +220,34 @@ void CTextureDrawable::UpdateTextureShaderVariable(ID3D11DeviceContext * pd3dDev
 CTextureDrawHP::CTextureDrawHP(IWICImagingFactory* pwicFactory, IDWriteFactory *pdwFactory, ID3D11Device* pd3dDevice, ID2D1Factory* pd2dFactory, UINT width, UINT height, DXGI_FORMAT format)
 	: CTextureDrawable(pwicFactory, pdwFactory, pd3dDevice, pd2dFactory, width, height, format)
 {
+	m_pd2dRenderTarget->CreateSolidColorBrush(ColorF(ColorF::DarkKhaki), &m_pd2dsbrFont);
 	m_pd2dRenderTarget->CreateSolidColorBrush(ColorF(ColorF::DimGray), &m_pd2dsbrHPBar);
 	m_pd2dRenderTarget->CreateSolidColorBrush(ColorF(ColorF::Crimson), &m_pd2dsbrHPGage);
+	m_pd2dsbrHPBar->SetOpacity(0.5f);
+	m_pd2dsbrHPGage->SetOpacity(0.6f);
 
-	m_pdwFactory->CreateTextFormat(L"Arial"
-		, nullptr
-		, DWRITE_FONT_WEIGHT_NORMAL
-		, DWRITE_FONT_STYLE_NORMAL
-		, DWRITE_FONT_STRETCH_NORMAL
-		, width * 0.15f
-		, L"ko-kr"
-		, reinterpret_cast<IDWriteTextFormat**>(&m_pdwTextFormat)
+	m_pdwFactory->CreateTextFormat(	  L"Arial"
+									, nullptr
+									, DWRITE_FONT_WEIGHT_NORMAL
+									, DWRITE_FONT_STYLE_NORMAL
+									, DWRITE_FONT_STRETCH_NORMAL
+									, width * 0.15f
+									, L"ko-kr"
+									, reinterpret_cast<IDWriteTextFormat**>(&m_pdwTextFormat)
 	);
+
 	m_pdwTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 	m_pdwTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	float fWidth = static_cast<float>(width);
 	float fHeight = static_cast<float>(height);
-	m_rcHPBar = RectF(fWidth * 0.25f, fHeight * 0.3f, fWidth * 0.95f, fHeight * 0.7f);
+	m_rcHPBar = RectF(fWidth * 0.25f, fHeight * 0.4f, fWidth * 0.95f, fHeight * 0.6f);
 	m_rcWriteID = RectF(0, 0, fWidth * 0.25f, fHeight);
 }
 
 CTextureDrawHP::~CTextureDrawHP()
 {
 	SafeRelease(m_pd2dsbrHPBar);
+	SafeRelease(m_pd2dsbrFont);
 	SafeRelease(m_pd2dsbrHPGage);
 }
 
@@ -257,7 +262,10 @@ void CTextureDrawHP::Render2D(CObject * obj)
 
 	m_pd2dRenderTarget->BeginDraw();
 	m_pd2dRenderTarget->Clear(ColorF(0.f,0.f,0.f,0.f));
-	m_pd2dRenderTarget->DrawText(strID.c_str(), static_cast<UINT>(strID.length()), m_pdwTextFormat, m_rcWriteID, m_pd2dsbrHPBar);
+	
+	m_pd2dRenderTarget->DrawText(	  strID.c_str(), static_cast<UINT>(strID.length())
+									, m_pdwTextFormat, m_rcWriteID, m_pd2dsbrFont);
+
 	m_pd2dRenderTarget->FillRectangle(m_rcHPBar, m_pd2dsbrHPBar);
 	
 	D2D_RECT_F rcCurrent = m_rcHPBar;

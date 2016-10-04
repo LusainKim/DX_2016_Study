@@ -200,9 +200,10 @@ public:
 
 protected:
 
-	ID2D1SolidColorBrush	*	m_pd2dsbrHPBar	{ nullptr }	;
-	ID2D1SolidColorBrush	*	m_pd2dsbrHPGage	{ nullptr }	;
-	IDWriteTextFormat		*	m_pdwTextFormat	{ nullptr }	;
+	ID2D1SolidColorBrush	*	m_pd2dsbrFont		{ nullptr };
+	ID2D1SolidColorBrush	*	m_pd2dsbrHPBar		{ nullptr }	;
+	ID2D1SolidColorBrush	*	m_pd2dsbrHPGage		{ nullptr }	;
+	IDWriteTextFormat		*	m_pdwTextFormat		{ nullptr }	;
 
 	D2D_RECT_F					m_rcHPBar;
 	D2D_RECT_F					m_rcWriteID;

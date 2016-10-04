@@ -10,9 +10,11 @@ public:
 	CTextureQuadObject(ID3D11Device* pd3dDevice, float width, float height);
 	virtual ~CTextureQuadObject() = default;
 
-	virtual void Update(float fTimeElapsed, const XMMATRIX& xmmtxObject, FXMVECTOR xmvPosition);
-	virtual void Render(ID3D11DeviceContext * pd3dDeviceContext);
+	virtual void Update(float fTimeElapsed, const XMMATRIX& xmmtxObject, FXMVECTOR xmvPosition, class CCamera* pCamera = nullptr);
+	virtual void Render(ID3D11DeviceContext * pd3dDeviceContext, class CCamera* pCamera = nullptr);
 
+	virtual void Render2D(CObject* obj) { m_pTextureDrawable->Render2D(obj); }
+	
 	template<typename TextureType, typename... Arg>
 	void CreateDrawableTexture(Arg&&... args)
 	{
