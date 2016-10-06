@@ -68,8 +68,11 @@ int CTextureQuadMesh::CheckRayIntersection(FXMVECTOR xmvRayPosition, FXMVECTOR x
 
 		auto timeElapsed = [&] (auto d) {
 			auto du = chrono::duration_cast<chrono::nanoseconds>(d).count();
+
+		#if USE_DEBUG_WINDOW
 			Event_MeasureTimeElapsed event(string("RayIntersectTriangle"), du);
 			CLogSystem::PropagateNotification(nullptr, &event);
+		#endif
 		};
 		// 시간 측정 함수
 //		if (MeasureFunctionTimeElapsed(timeElapsed, RayIntersectTriangle, xmvRayPosition, XMVector4Normalize(xmvRayDirection), xmv[0], xmv[1], xmv[2], &fuHitBaryCentric, &fvHitBaryCentric, &fHitDistance))

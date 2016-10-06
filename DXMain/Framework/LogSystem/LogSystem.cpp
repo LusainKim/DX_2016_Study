@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#if USE_DEBUG_WINDOW
+
 #include "LogSystem.h"
 #include "Objects\Base\Object.h"
 
@@ -371,3 +374,5 @@ void CCustomLoggerObserver::Draw(HDC hdc, RECT& rcDrawArea)
 
 	}
 }
+
+#endif

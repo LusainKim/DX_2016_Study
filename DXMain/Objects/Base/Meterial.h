@@ -1,5 +1,7 @@
 #pragma once
 
+class CObject;
+
 class CMaterialColors
 {
 public:

@@ -1,4 +1,5 @@
 #pragma once
+#if USE_DEBUG_WINDOW
 
 struct Event 
 {
@@ -184,3 +185,5 @@ public:
 	static void PropagateNotification(const class CObject* obj, Event* pEvent);
 
 };
+
+#endif
