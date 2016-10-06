@@ -15,6 +15,6 @@ public:
 protected:
 
 	ID3D11Buffer						*	m_pd3dTexture2DQuadBuffer { nullptr };
-	vector<Texture2DQuadConstantBuffer>		m_vTexture2DQuadBuffer;
+	vector<PositionTextureConstantBuffer>		m_vTexture2DQuadBuffer;
 
 };

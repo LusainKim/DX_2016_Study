@@ -78,7 +78,7 @@ CTexture::~CTexture()
 // Texture 연결
 void CTexture::SetTexture(int nIndex, ID3D11ShaderResourceView *pd3dsrvTexture)
 {
-	assert(nIndex > m_ppd3dsrvTextures.size() && "Index가 허용 범위를 넘었습니다!");
+	assert(nIndex < m_ppd3dsrvTextures.size() && "Index가 허용 범위를 넘었습니다!");
 	
 	if (pd3dsrvTexture) pd3dsrvTexture->AddRef();
 	
@@ -91,7 +91,7 @@ void CTexture::SetTexture(int nIndex, ID3D11ShaderResourceView *pd3dsrvTexture)
 // Sampler에 연결
 void CTexture::SetSampler(int nIndex, ID3D11SamplerState *pd3dSamplerState)
 {
-	assert(nIndex > m_ppd3dSamplerStates.size() && "Index가 허용 범위를 넘었습니다!");
+	assert(nIndex < m_ppd3dSamplerStates.size() && "Index가 허용 범위를 넘었습니다!");
 
 	if (pd3dSamplerState) pd3dSamplerState->AddRef();
 

@@ -23,7 +23,7 @@ CTextureQuadMesh::CTextureQuadMesh(ID3D11Device * pd3dDevice, float fWidth, floa
 	vertexBufferData.SysMemPitch = 0;
 	vertexBufferData.SysMemSlicePitch = 0;
 	CD3D11_BUFFER_DESC vertexBufferDesc(
-		  static_cast<UINT>(m_vTexture2DQuadBuffer.size() * sizeof(Texture2DQuadConstantBuffer))
+		  static_cast<UINT>(m_vTexture2DQuadBuffer.size() * sizeof(PositionTextureConstantBuffer))
 		, D3D11_BIND_VERTEX_BUFFER);
 
 	pd3dDevice->CreateBuffer(
@@ -31,7 +31,7 @@ CTextureQuadMesh::CTextureQuadMesh(ID3D11Device * pd3dDevice, float fWidth, floa
 		, &vertexBufferData
 		, &m_pd3dTexture2DQuadBuffer
 	);
-	AssembleToVertexBuffers(m_pd3dTexture2DQuadBuffer, sizeof(Texture2DQuadConstantBuffer), 0);
+	AssembleToVertexBuffers(m_pd3dTexture2DQuadBuffer, sizeof(PositionTextureConstantBuffer), 0);
 
 }
 
@@ -57,9 +57,9 @@ int CTextureQuadMesh::CheckRayIntersection(FXMVECTOR xmvRayPosition, FXMVECTOR x
 	
 	for (int i = 0; i < nPrimitives; i++)
 	{
-		v0 = reinterpret_cast<Texture2DQuadConstantBuffer*>(pbPositions + ((m_nIndices > 0) ? (m_vIndies[(i * nOffset) + 0]) : ((i * nOffset) + 0)) * m_vVertexStrides[0])->pos;
-		v1 = reinterpret_cast<Texture2DQuadConstantBuffer*>(pbPositions + ((m_nIndices > 0) ? (m_vIndies[(i * nOffset) + 1]) : ((i * nOffset) + 1)) * m_vVertexStrides[0])->pos;
-		v2 = reinterpret_cast<Texture2DQuadConstantBuffer*>(pbPositions + ((m_nIndices > 0) ? (m_vIndies[(i * nOffset) + 2]) : ((i * nOffset) + 2)) * m_vVertexStrides[0])->pos;
+		v0 = reinterpret_cast<PositionTextureConstantBuffer*>(pbPositions + ((m_nIndices > 0) ? (m_vIndies[(i * nOffset) + 0]) : ((i * nOffset) + 0)) * m_vVertexStrides[0])->pos;
+		v1 = reinterpret_cast<PositionTextureConstantBuffer*>(pbPositions + ((m_nIndices > 0) ? (m_vIndies[(i * nOffset) + 1]) : ((i * nOffset) + 1)) * m_vVertexStrides[0])->pos;
+		v2 = reinterpret_cast<PositionTextureConstantBuffer*>(pbPositions + ((m_nIndices > 0) ? (m_vIndies[(i * nOffset) + 2]) : ((i * nOffset) + 2)) * m_vVertexStrides[0])->pos;
 
 		XMVECTOR xmv[3] { XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2) };
 		// 원본 함수

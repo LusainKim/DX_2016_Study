@@ -82,6 +82,9 @@
     <Filter Include="GameObject\TextureQuad\Object">
       <UniqueIdentifier>{014d451c-b4e2-45bb-9916-d4169048926e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="미리 컴파일된 헤더\TextureLoader">
+      <UniqueIdentifier>{ce08eca1-c05a-4743-ae35-8555f5d53811}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera\Camera.h">
@@ -156,6 +159,9 @@
     <ClInclude Include="HLSL\BindingBufferStructs.h">
       <Filter>HLSL</Filter>
     </ClInclude>
+    <ClInclude Include="DirectX\TextureLoader\WICTextureLoader.h">
+      <Filter>미리 컴파일된 헤더\TextureLoader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera\Camera.cpp">
@@ -208,6 +214,9 @@
     </ClCompile>
     <ClCompile Include="Objects\TextureQuad\TextureQuadShader.cpp">
       <Filter>GameObject\TextureQuad\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectX\TextureLoader\WICTextureLoader.cpp">
+      <Filter>미리 컴파일된 헤더\TextureLoader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

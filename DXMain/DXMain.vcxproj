@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera\Camera.h" />
+    <ClInclude Include="DirectX\TextureLoader\WICTextureLoader.h" />
     <ClInclude Include="DXMain.h" />
     <ClInclude Include="Framework\Framework.h" />
     <ClInclude Include="Framework\LogSystem\LogSystem.h" />
@@ -46,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera\Camera.cpp" />
+    <ClCompile Include="DirectX\TextureLoader\WICTextureLoader.cpp" />
     <ClCompile Include="DXMain.cpp" />
     <ClCompile Include="Framework\Framework.cpp" />
     <ClCompile Include="Framework\LogSystem\LogSystem.cpp" />
