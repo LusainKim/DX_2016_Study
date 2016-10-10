@@ -170,7 +170,7 @@ class scroll_Win32 : public basic_scroll{
 
 protected:
 	//	스크롤의 투명도입니다.
-	int		m_iOpacity;
+	BYTE	m_iOpacity;
 	//	스크롤 영역입니다. 이 영역대로 그립니다.
 	RECT	m_rcScroll;
 	//	Thumb의 영역입니다. 이 영역대로 그립니다.
@@ -199,7 +199,7 @@ public:
 	{
 		basic_scroll::initialize(type, ScrLength, ScrViewLength, ScrollLength, ThumbLength, thickness);
 		m_ptWorldPosition = WorldPosition;
-		m_iOpacity = Opacity;
+		m_iOpacity = static_cast<decltype(m_iOpacity)>(Opacity);
 		RenewalThumbRect();
 		if (m_scType == SCRType::SCR_H)
 			m_rcScroll = RECT{

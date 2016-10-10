@@ -37,10 +37,6 @@ CTextureQuadMesh::CTextureQuadMesh(ID3D11Device * pd3dDevice, float fWidth, floa
 
 int CTextureQuadMesh::CheckRayIntersection(FXMVECTOR xmvRayPosition, FXMVECTOR xmvRayDirection, MESHINTERSECTINFO * pd3dxIntersectInfo)
 {
-	return 0;
-
-
-
 	auto m_nIndices = static_cast<int>(m_vIndies.size());
 	int nIntersections = 0;
 	BYTE * pbPositions = reinterpret_cast<BYTE *>(&m_vTexture2DQuadBuffer[0]) + m_vVertexOffset[0];
