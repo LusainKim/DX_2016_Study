@@ -43,9 +43,6 @@
     <Filter Include="GameObject\Box\Object">
       <UniqueIdentifier>{a34a944b-ae40-485c-82f0-cf7fbf494bbf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GameObject\Box\Shader">
-      <UniqueIdentifier>{3cdc43cc-ac5d-4101-b53a-6836d51b75c9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Camera">
       <UniqueIdentifier>{c23f2eb1-efd0-4ed0-9f31-eb81bdde93cc}</UniqueIdentifier>
     </Filter>
@@ -72,9 +69,6 @@
     </Filter>
     <Filter Include="GameObject\TextureQuad">
       <UniqueIdentifier>{4e970c35-0533-47fd-b97a-237ce06be26d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameObject\TextureQuad\Shader">
-      <UniqueIdentifier>{dff8e4e6-1ad6-46ee-88f3-9a00db090bdb}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameObject\TextureQuad\Mesh">
       <UniqueIdentifier>{247b0fbe-b2af-4fae-a097-bde01715d160}</UniqueIdentifier>
@@ -104,9 +98,6 @@
     </ClInclude>
     <ClInclude Include="Objects\Box\BoxObject.h">
       <Filter>GameObject\Box\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Box\BoxShader.h">
-      <Filter>GameObject\Box\Shader</Filter>
     </ClInclude>
     <ClInclude Include="stdafx\stdafx.h">
       <Filter>미리 컴파일된 헤더</Filter>
@@ -153,9 +144,6 @@
     <ClInclude Include="Objects\TextureQuad\TextureQuadMesh.h">
       <Filter>GameObject\TextureQuad\Mesh</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\TextureQuad\TextureQuadShader.h">
-      <Filter>GameObject\TextureQuad\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="HLSL\BindingBufferStructs.h">
       <Filter>HLSL</Filter>
     </ClInclude>
@@ -175,9 +163,6 @@
     </ClCompile>
     <ClCompile Include="Objects\Box\BoxObject.cpp">
       <Filter>GameObject\Box\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\Box\BoxShader.cpp">
-      <Filter>GameObject\Box\Shader</Filter>
     </ClCompile>
     <ClCompile Include="stdafx\stdafx.cpp">
       <Filter>미리 컴파일된 헤더</Filter>
@@ -211,9 +196,6 @@
     </ClCompile>
     <ClCompile Include="Objects\TextureQuad\TextureQuadMesh.cpp">
       <Filter>GameObject\TextureQuad\Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TextureQuad\TextureQuadShader.cpp">
-      <Filter>GameObject\TextureQuad\Shader</Filter>
     </ClCompile>
     <ClCompile Include="DirectX\TextureLoader\WICTextureLoader.cpp">
       <Filter>미리 컴파일된 헤더\TextureLoader</Filter>

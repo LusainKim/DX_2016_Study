@@ -1,6 +1,6 @@
 #pragma once
 
-#define Measure_Time_Elapsed
+#define use_Measure_Time_Elapsed true
 
 struct function_invoke_return_late_for_measure_time_elapsed
 {	
@@ -66,7 +66,7 @@ struct InvokerMeasureFunc<Ty, false>
 
 /// <summary>
 /// <para>함수의 실행 시간을 측정하는 함수입니다. </para>
-/// <para>Measure_Time_Elapsed 전처리기로 기능을 사용하지 않을 수 있습니다. </para>
+/// <para>use_Measure_Time_Elapsed 전처리기로 기능을 사용하지 않을 수 있습니다. </para>
 /// <para>시간을 측정하는 함수는 인자로 duration〈long long, std::nano〉 타입의 인자를 받습니다. </para>
 /// </summary>
 ///	<param name = "outputFunc"> 시간을 측정하는 함수입니다. 시간을 알고 싶다면 원하는 시간 열거자를 사용하세요.  </param>
@@ -84,7 +84,7 @@ struct InvokerMeasureFunc<Ty, false>
 template<typename FnOutput, typename FnFunc, typename... Args> inline
 constexpr auto MeasureFunctionTimeElapsed(FnOutput&& outputFunc, FnFunc&& Function, Args&&... args) noexcept
 {
-#ifdef Measure_Time_Elapsed
+#if use_Measure_Time_Elapsed
 	return (InvokerMeasureFunc<result_of<FnFunc &(Args...)>::type>::_Call(
 		_STD forward<FnFunc>(Function), _STD forward<FnOutput>(outputFunc), _STD forward<Args>(args)...)
 		);
@@ -95,7 +95,7 @@ constexpr auto MeasureFunctionTimeElapsed(FnOutput&& outputFunc, FnFunc&& Functi
 
 /// <summary>
 /// <para>람다로 감싼 블럭의 실행 시간을 측정하는 함수입니다. </para>
-/// <para>Measure_Time_Elapsed 전처리기로 기능을 사용하지 않을 수 있습니다. </para>
+/// <para>use_Measure_Time_Elapsed 전처리기로 기능을 사용하지 않을 수 있습니다. </para>
 /// <para>시간을 측정하는 함수는 인자로 duration〈long long, std::nano〉 타입의 인자를 받습니다. </para>
 /// </summary>
 ///	<param name = "outputFunc"> 시간을 측정하는 함수입니다. 시간을 알고 싶다면 원하는 시간 열거자를 사용하세요.  </param>
@@ -110,7 +110,7 @@ constexpr auto MeasureFunctionTimeElapsed(FnOutput&& outputFunc, FnFunc&& Functi
 template<typename FnOutput, typename FnFunc> inline
 constexpr void MeasureBlockTimeElapsed(FnOutput&& outputFunc, FnFunc&& Function) noexcept
 {
-#ifdef Measure_Time_Elapsed
+#if use_Measure_Time_Elapsed
 
 	auto startTime = std::chrono::high_resolution_clock::now();
 

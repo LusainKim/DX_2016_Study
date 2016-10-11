@@ -35,10 +35,8 @@
     <ClInclude Include="Objects\Base\Shader.h" />
     <ClInclude Include="Objects\Box\BoxMesh.h" />
     <ClInclude Include="Objects\Box\BoxObject.h" />
-    <ClInclude Include="Objects\Box\BoxShader.h" />
     <ClInclude Include="Objects\TextureQuad\TextureQuadMesh.h" />
     <ClInclude Include="Objects\TextureQuad\TextureQuadObject.h" />
-    <ClInclude Include="Objects\TextureQuad\TextureQuadShader.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene\Scene.h" />
     <ClInclude Include="Scene\Title\TitleScene.h" />
@@ -57,10 +55,8 @@
     <ClCompile Include="Objects\Base\Shader.cpp" />
     <ClCompile Include="Objects\Box\BoxMesh.cpp" />
     <ClCompile Include="Objects\Box\BoxObject.cpp" />
-    <ClCompile Include="Objects\Box\BoxShader.cpp" />
     <ClCompile Include="Objects\TextureQuad\TextureQuadMesh.cpp" />
     <ClCompile Include="Objects\TextureQuad\TextureQuadObject.cpp" />
-    <ClCompile Include="Objects\TextureQuad\TextureQuadShader.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Scene\Title\TitleScene.cpp" />
     <ClCompile Include="stdafx\stdafx.cpp" />

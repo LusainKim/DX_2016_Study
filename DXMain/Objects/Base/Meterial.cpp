@@ -27,7 +27,7 @@ ID3D11ShaderResourceView *CTextureBase::CreateRandomTexture1DSRV(ID3D11Device *p
 	auto RANDOMCOLOR = [] (float min, float max)
 	{ return static_cast<float>(rand() / static_cast<float>(RAND_MAX)) * (max - min) + min; };
 
-	XMCOLOR RV[1024];
+	XMCOLOR RV[1024] {};
 	for (int i = 0; i < 1024; i++) RV[i] = XMCOLOR(RANDOMCOLOR(-1.0, 1.0f), RANDOMCOLOR(-1.0, 1.0f), RANDOMCOLOR(-1.0, 1.0f), RANDOMCOLOR(-1.0, 1.0f));
 	D3D11_SUBRESOURCE_DATA d3dSubresourceData;
 	d3dSubresourceData.pSysMem = RV;
@@ -42,9 +42,12 @@ ID3D11ShaderResourceView *CTextureBase::CreateRandomTexture1DSRV(ID3D11Device *p
 	d3dTextureDesc.Usage = D3D11_USAGE_IMMUTABLE;
 	d3dTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	d3dTextureDesc.ArraySize = 1;
-	ID3D11Texture1D *pd3dTexture;
+	ID3D11Texture1D *pd3dTexture = nullptr;
 	// Texture1D를 제작
 	pd3dDevice->CreateTexture1D(&d3dTextureDesc, &d3dSubresourceData, &pd3dTexture);
+
+	if (!pd3dTexture) return nullptr;
+
 	ID3D11ShaderResourceView *pd3dsrvTexture;
 	//쉐이더 리소스 뷰 제작
 	pd3dDevice->CreateShaderResourceView(pd3dTexture, NULL, &pd3dsrvTexture);
@@ -141,8 +144,6 @@ void CTexture::ReleaseShaderVariables()
 // for animation texture
 void CTexture::UpdateAnimationTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext, XMMATRIX *pd3dxmtxTexture)
 {
-	return;
-
 	// 그래픽 장치로 보낼 수 있도록 상수 버퍼를 준비합니다.
 	pd3dDeviceContext->UpdateSubresource(	  m_pd3dcbTextureMatrix
 											, 0

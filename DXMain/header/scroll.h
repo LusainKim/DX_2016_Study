@@ -337,13 +337,15 @@ public:
 		SetDCBrushColor(LayDC, RGB(255, 255, 255));
 		SelectObject(LayDC, (HBRUSH)GetStockObject(DC_BRUSH));
 
-		RoundRect(LayDC, m_rcScroll.left, m_rcScroll.top, m_rcScroll.right, m_rcScroll.bottom, m_flThickness * 0.5f, m_flThickness * 0.5f);
+		auto fRoundLevel = static_cast<int>(m_flThickness * 0.5f);
+
+		RoundRect(LayDC, m_rcScroll.left, m_rcScroll.top, m_rcScroll.right, m_rcScroll.bottom, fRoundLevel, fRoundLevel);
 
 		SetDCPenColor(LayDC, color);
 		SetDCBrushColor(LayDC, color);
 		SelectObject(LayDC, (HBRUSH)GetStockObject(DC_BRUSH));
 		SelectObject(LayDC, (HPEN)GetStockObject(DC_PEN));
-		RoundRect(LayDC, m_rcThumb.left, m_rcThumb.top, m_rcThumb.right, m_rcThumb.bottom, m_flThickness * 0.5f, m_flThickness * 0.5f);
+		RoundRect(LayDC, m_rcThumb.left, m_rcThumb.top, m_rcThumb.right, m_rcThumb.bottom, fRoundLevel, fRoundLevel);
 
 		AlphaBlend(hDC, DrawAreaSize.left, DrawAreaSize.top, DrawAreaSize.right - DrawAreaSize.left, DrawAreaSize.bottom - DrawAreaSize.top,
 			LayDC, DrawAreaSize.left, DrawAreaSize.top, DrawAreaSize.right - DrawAreaSize.left, DrawAreaSize.bottom - DrawAreaSize.top, bf);

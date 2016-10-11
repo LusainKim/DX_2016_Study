@@ -63,9 +63,10 @@ int CTextureQuadMesh::CheckRayIntersection(FXMVECTOR xmvRayPosition, FXMVECTOR x
 //		if (::RayIntersectTriangle(xmvRayPosition, XMVector4Normalize(xmvRayDirection), xmv[0], xmv[1], xmv[2], &fuHitBaryCentric, &fvHitBaryCentric, &fHitDistance))
 
 		auto timeElapsed = [&] (auto d) {
-			auto du = chrono::duration_cast<chrono::nanoseconds>(d).count();
 
 		#if USE_DEBUG_WINDOW
+			auto du = chrono::duration_cast<chrono::nanoseconds>(d).count();
+
 			Event_MeasureTimeElapsed event(string("RayIntersectTriangle"), du);
 			CLogSystem::PropagateNotification(nullptr, &event);
 		#endif

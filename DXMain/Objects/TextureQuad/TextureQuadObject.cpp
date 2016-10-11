@@ -13,8 +13,11 @@ CTextureQuadObject::CTextureQuadObject(ID3D11Device * pd3dDevice, float width, f
 	CreateRasterizerState(pd3dDevice, D3D11_CULL_NONE);
 }
 
-void CTextureQuadObject::Update(float fTimeElapsed)
+void CTextureQuadObject::Update(float fTimeElapsed, CObject* obj)
 {
+
+	// Update Rendering
+	Render2D(obj);
 }
 
 void CTextureQuadObject::Render(ID3D11DeviceContext * pd3dDeviceContext, CCamera* pCamera)
