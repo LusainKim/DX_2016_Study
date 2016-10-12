@@ -87,9 +87,6 @@
     <ClInclude Include="targetver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="DXMain.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -149,6 +146,9 @@
     </ClInclude>
     <ClInclude Include="DirectX\TextureLoader\WICTextureLoader.h">
       <Filter>미리 컴파일된 헤더\TextureLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\Resource.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -211,6 +211,10 @@
     <None Include="HLSL\BindingBuffer.hlsli">
       <Filter>HLSL</Filter>
     </None>
+    <None Include="CSO\PositionColorVertexShader.cso" />
+    <None Include="CSO\PositionColorPixelShader.cso" />
+    <None Include="CSO\Texture2DQuadVertexShader.cso" />
+    <None Include="CSO\Texture2DQuadPixelShader.cso" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSL\PositionColor\PositionColorPixelShader.hlsl">

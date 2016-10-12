@@ -108,7 +108,7 @@ constexpr auto MeasureFunctionTimeElapsed(FnOutput&& outputFunc, FnFunc&& Functi
 ///	</remarks>
 /// <returns> 반환값은 없습니다. </returns>
 template<typename FnOutput, typename FnFunc> inline
-constexpr void MeasureBlockTimeElapsed(FnOutput&& outputFunc, FnFunc&& Function) noexcept
+void MeasureBlockTimeElapsed(FnOutput&& outputFunc, FnFunc&& Function) noexcept
 {
 #if use_Measure_Time_Elapsed
 
