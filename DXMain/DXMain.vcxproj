@@ -62,10 +62,6 @@
     <ClCompile Include="stdafx\stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CSO\PositionColorPixelShader.cso" />
-    <None Include="CSO\PositionColorVertexShader.cso" />
-    <None Include="CSO\Texture2DQuadPixelShader.cso" />
-    <None Include="CSO\Texture2DQuadVertexShader.cso" />
     <None Include="HLSL\BindingBuffer.hlsli" />
     <None Include="HLSL\PositionColor\PositionColorBufferStructs.hlsli" />
     <None Include="HLSL\Texture2DQuad\Texture2DQuadBufferStruct.hlsli" />

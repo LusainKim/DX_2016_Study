@@ -211,10 +211,6 @@
     <None Include="HLSL\BindingBuffer.hlsli">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="CSO\PositionColorVertexShader.cso" />
-    <None Include="CSO\PositionColorPixelShader.cso" />
-    <None Include="CSO\Texture2DQuadVertexShader.cso" />
-    <None Include="CSO\Texture2DQuadPixelShader.cso" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSL\PositionColor\PositionColorPixelShader.hlsl">
