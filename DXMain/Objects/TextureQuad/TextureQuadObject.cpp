@@ -17,14 +17,15 @@ void CTextureQuadObject::Update(float fTimeElapsed, CObject* obj)
 {
 
 	// Update Rendering
-	Render2D(obj);
+	if (m_bDrawableTexture)
+		Render2D(obj);
 }
 
 void CTextureQuadObject::Render(ID3D11DeviceContext * pd3dDeviceContext, CCamera* pCamera)
 {
 	// Shader Set
 	m_Shader.Render(pd3dDeviceContext);
-	m_pTextureDrawable->UpdateTextureShaderVariable(pd3dDeviceContext);
+	m_pTexture->UpdateTextureShaderVariable(pd3dDeviceContext);
 
 	CObject::OnPrepareRender(pd3dDeviceContext);
 	

@@ -221,7 +221,7 @@ void CTextureDrawable::UpdateTextureShaderVariable(ID3D11DeviceContext * pd3dDev
 CTextureDrawHP::CTextureDrawHP(IWICImagingFactory* pwicFactory, IDWriteFactory *pdwFactory, ID3D11Device* pd3dDevice, ID2D1Factory* pd2dFactory, UINT width, UINT height, DXGI_FORMAT format)
 	: CTextureDrawable(pwicFactory, pdwFactory, pd3dDevice, pd2dFactory, width, height, format)
 {
-	m_pd2dRenderTarget->CreateSolidColorBrush(ColorF(ColorF::DarkKhaki), &m_pd2dsbrFont);
+	m_pd2dRenderTarget->CreateSolidColorBrush(ColorF(ColorF::RoyalBlue), &m_pd2dsbrFont);
 	m_pd2dRenderTarget->CreateSolidColorBrush(ColorF(ColorF::DimGray), &m_pd2dsbrHPBar);
 	m_pd2dRenderTarget->CreateSolidColorBrush(ColorF(ColorF::Crimson), &m_pd2dsbrHPGage);
 	m_pd2dsbrHPBar->SetOpacity(0.5f);

@@ -41,6 +41,8 @@ public:
 	CTextureBase() = default;
 	virtual ~CTextureBase() = default;
 	
+	virtual void UpdateTextureShaderVariable(ID3D11DeviceContext *pd3dDeviceContext) = 0;
+
 
 	static ID3D11ShaderResourceView *CreateRandomTexture1DSRV(ID3D11Device *pd3dDevice);
 	
