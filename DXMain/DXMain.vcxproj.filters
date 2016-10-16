@@ -76,9 +76,6 @@
     <Filter Include="GameObject\TextureQuad\Object">
       <UniqueIdentifier>{014d451c-b4e2-45bb-9916-d4169048926e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="미리 컴파일된 헤더\TextureLoader">
-      <UniqueIdentifier>{ce08eca1-c05a-4743-ae35-8555f5d53811}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera\Camera.h">
@@ -111,26 +108,14 @@
     <ClInclude Include="Objects\Base\Shader.h">
       <Filter>GameObject\Base\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="header\D2D_Operator.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="header\LusWrite.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Scene\Scene.h">
       <Filter>Scene\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Title\TitleScene.h">
       <Filter>Scene\TitleScene</Filter>
     </ClInclude>
-    <ClInclude Include="header\MeasureFunctionTimeElapsed.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Framework\LogSystem\LogSystem.h">
       <Filter>Framework\LogSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="header\scroll.h">
-      <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Objects\Base\Meterial.h">
       <Filter>GameObject\Base</Filter>
@@ -143,9 +128,6 @@
     </ClInclude>
     <ClInclude Include="HLSL\BindingBufferStructs.h">
       <Filter>HLSL</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectX\TextureLoader\WICTextureLoader.h">
-      <Filter>미리 컴파일된 헤더\TextureLoader</Filter>
     </ClInclude>
     <ClInclude Include="Resource\Resource.h">
       <Filter>헤더 파일</Filter>
@@ -196,9 +178,6 @@
     </ClCompile>
     <ClCompile Include="Objects\TextureQuad\TextureQuadMesh.cpp">
       <Filter>GameObject\TextureQuad\Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectX\TextureLoader\WICTextureLoader.cpp">
-      <Filter>미리 컴파일된 헤더\TextureLoader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

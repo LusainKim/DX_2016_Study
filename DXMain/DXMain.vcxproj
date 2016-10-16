@@ -20,14 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera\Camera.h" />
-    <ClInclude Include="DirectX\TextureLoader\WICTextureLoader.h" />
     <ClInclude Include="DXMain.h" />
     <ClInclude Include="Framework\Framework.h" />
     <ClInclude Include="Framework\LogSystem\LogSystem.h" />
-    <ClInclude Include="header\D2D_Operator.h" />
-    <ClInclude Include="header\LusWrite.h" />
-    <ClInclude Include="header\MeasureFunctionTimeElapsed.h" />
-    <ClInclude Include="header\scroll.h" />
     <ClInclude Include="HLSL\BindingBufferStructs.h" />
     <ClInclude Include="Objects\Base\Mesh.h" />
     <ClInclude Include="Objects\Base\Meterial.h" />
@@ -45,7 +40,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera\Camera.cpp" />
-    <ClCompile Include="DirectX\TextureLoader\WICTextureLoader.cpp" />
     <ClCompile Include="DXMain.cpp" />
     <ClCompile Include="Framework\Framework.cpp" />
     <ClCompile Include="Framework\LogSystem\LogSystem.cpp" />
@@ -122,6 +116,11 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource\DXMain.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Utils\Utils.vcxproj">
+      <Project>{579bf471-ed60-46bd-ad06-3a045a00b6ef}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F760C4D0-1A57-4BBC-B65B-66E557A785EA}</ProjectGuid>
@@ -207,7 +206,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>stdafx\;.\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>stdafx\;..\Utils;.\</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <Link>
